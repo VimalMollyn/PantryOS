@@ -1,0 +1,3954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PantryOS - Your Personal Cooking Assistant</title>
+    
+    <!-- Google Fonts - Distinctive typography choices -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ============================================
+           CSS VARIABLES & RESET
+           ============================================ */
+        :root {
+            /* Warm, earthy palette inspired by fresh ingredients */
+            --color-cream: #FBF7F0;
+            --color-sage: #7C9A6B;
+            --color-sage-dark: #5A7A4B;
+            --color-terracotta: #C4784A;
+            --color-terracotta-light: #E8A878;
+            --color-charcoal: #2D2D2D;
+            --color-warm-gray: #6B6560;
+            --color-light-sage: #E8F0E4;
+            --color-danger: #C44A4A;
+            --color-success: #4A9A6B;
+            
+            /* Typography */
+            --font-display: 'Fraunces', Georgia, serif;
+            --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            
+            /* Border radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+            
+            /* Transitions */
+            --transition-fast: 150ms ease;
+            --transition-normal: 250ms ease;
+            --transition-slow: 400ms ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* ============================================
+           BASE STYLES
+           ============================================ */
+        body {
+            font-family: var(--font-body);
+            background: var(--color-cream);
+            color: var(--color-charcoal);
+            min-height: 100vh;
+            line-height: 1.6;
+            /* Subtle grain texture overlay */
+            background-image: 
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+        }
+        
+        /* ============================================
+           APP CONTAINER
+           ============================================ */
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: var(--space-md);
+            min-height: 100vh;
+        }
+        
+        /* ============================================
+           HEADER
+           ============================================ */
+        .header {
+            text-align: center;
+            padding: var(--space-xl) 0;
+            animation: fadeInDown 0.6s ease-out;
+        }
+        
+        .header h1 {
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--color-sage-dark);
+            letter-spacing: -0.02em;
+        }
+        
+        .header p {
+            color: var(--color-warm-gray);
+            margin-top: var(--space-xs);
+            font-size: 0.95rem;
+        }
+        
+        .header-egg {
+            font-size: 5rem;
+            margin-top: var(--space-sm);
+            animation: eggBounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes eggBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        /* ============================================
+           PAGE / SCREEN STYLES
+           ============================================ */
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* ============================================
+           BUTTONS
+           ============================================ */
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            width: 100%;
+            padding: var(--space-md) var(--space-lg);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-primary {
+            background: var(--color-sage);
+            color: white;
+            box-shadow: 0 4px 12px rgba(124, 154, 107, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: var(--color-sage-dark);
+            box-shadow: 0 6px 16px rgba(124, 154, 107, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--color-charcoal);
+            border: 2px solid var(--color-light-sage);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--color-sage);
+            background: var(--color-light-sage);
+        }
+        
+        .btn-accent {
+            background: var(--color-terracotta);
+            color: white;
+            box-shadow: 0 4px 12px rgba(196, 120, 74, 0.3);
+        }
+        
+        .btn-accent:hover {
+            background: #B36840;
+            box-shadow: 0 6px 16px rgba(196, 120, 74, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #D4A574 0%, #C49756 100%);
+            color: white;
+            border: 2px dashed rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+        }
+        
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #C49756 0%, #B38746 100%);
+            box-shadow: 0 6px 16px rgba(212, 165, 116, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: var(--color-danger);
+            color: white;
+        }
+        
+        .btn-small {
+            padding: var(--space-sm) var(--space-md);
+            font-size: 0.875rem;
+        }
+        
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: var(--radius-sm);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        /* ============================================
+           HOME MENU
+           ============================================ */
+        .home-menu {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+        
+        .home-menu .btn {
+            padding: var(--space-lg);
+            font-size: 1.1rem;
+        }
+        
+        .menu-icon {
+            font-size: 1.5rem;
+        }
+        
+        /* ============================================
+           CARDS
+           ============================================ */
+        .card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: var(--space-md);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-md);
+        }
+        
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-charcoal);
+        }
+        
+        /* ============================================
+           FORM ELEMENTS
+           ============================================ */
+        .form-group {
+            margin-bottom: var(--space-md);
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--color-warm-gray);
+            margin-bottom: var(--space-xs);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: var(--space-md);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            border: 2px solid var(--color-light-sage);
+            border-radius: var(--radius-md);
+            background: white;
+            transition: border-color var(--transition-fast);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-sage);
+        }
+        
+        textarea.form-input {
+            resize: vertical;
+            min-height: 80px;
+            line-height: 1.5;
+        }
+        
+        .form-input::placeholder {
+            color: #aaa;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: var(--space-sm);
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        /* ============================================
+           PANTRY LIST
+           ============================================ */
+        .pantry-list {
+            list-style: none;
+        }
+        
+        .pantry-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-md);
+            background: var(--color-light-sage);
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--space-sm);
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .pantry-item-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .pantry-item-name {
+            font-weight: 600;
+            color: var(--color-charcoal);
+        }
+        
+        .pantry-item-qty {
+            font-size: 0.875rem;
+            color: var(--color-warm-gray);
+        }
+        
+        .pantry-empty {
+            text-align: center;
+            padding: var(--space-xl);
+            color: var(--color-warm-gray);
+        }
+        
+        /* ============================================
+           RECIPE TITLES
+           ============================================ */
+        .recipe-title-card {
+            padding: var(--space-lg);
+            background: white;
+            border: 2px solid var(--color-light-sage);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-md);
+            transition: all var(--transition-normal);
+            cursor: pointer;
+        }
+        
+        .recipe-title-card:hover {
+            border-color: var(--color-sage);
+            background: var(--color-light-sage);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 158, 124, 0.2);
+        }
+        
+        .recipe-title-card:active {
+            transform: translateY(0);
+        }
+        
+        .recipe-title-card-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        
+        .recipe-title-name {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-charcoal);
+            flex: 1;
+        }
+        
+        .recipe-title-macros {
+            display: flex;
+            gap: var(--space-xs);
+            flex-shrink: 0;
+        }
+        
+        .title-macro {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: var(--space-xs) var(--space-sm);
+            background: var(--color-light-sage);
+            border-radius: var(--radius-sm);
+            min-width: 48px;
+        }
+        
+        .title-macro.calories {
+            background: linear-gradient(135deg, var(--color-terracotta-light), var(--color-terracotta));
+        }
+        
+        .title-macro.calories .title-macro-value,
+        .title-macro.calories .title-macro-label {
+            color: white;
+        }
+        
+        .title-macro-value {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--color-sage-dark);
+            line-height: 1;
+        }
+        
+        .title-macro-label {
+            font-size: 0.6rem;
+            color: var(--color-warm-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-top: 2px;
+        }
+        
+        /* ============================================
+           RECIPE DISPLAY
+           ============================================ */
+        .recipe-header {
+            text-align: center;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .recipe-header h2 {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--color-sage-dark);
+        }
+        
+        .recipe-meta {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-lg);
+            margin-top: var(--space-md);
+            font-size: 0.875rem;
+            color: var(--color-warm-gray);
+        }
+        
+        .recipe-meta span {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+        
+        .recipe-section {
+            margin-bottom: var(--space-lg);
+        }
+        
+        .recipe-section h3 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-charcoal);
+            margin-bottom: var(--space-md);
+            padding-bottom: var(--space-xs);
+            border-bottom: 2px solid var(--color-light-sage);
+        }
+        
+        .modify-recipe-section {
+            background: linear-gradient(135deg, rgba(168, 195, 160, 0.1) 0%, rgba(212, 188, 155, 0.1) 100%);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            margin-top: var(--space-md);
+            border: 1px dashed var(--color-sage);
+        }
+        
+        .modify-recipe-section h3 {
+            border-bottom: none;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .ingredient-list {
+            list-style: none;
+        }
+        
+        .ingredient-item {
+            display: flex;
+            align-items: center;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--color-light-sage);
+        }
+        
+        .ingredient-item:last-child {
+            border-bottom: none;
+        }
+        
+        .ingredient-status {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: var(--space-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+        
+        .ingredient-have {
+            background: var(--color-light-sage);
+            color: var(--color-sage-dark);
+        }
+        
+        .ingredient-missing {
+            background: #FDEAEA;
+            color: var(--color-danger);
+        }
+        
+        .instruction-list {
+            list-style: none;
+            counter-reset: step;
+        }
+        
+        .instruction-item {
+            position: relative;
+            padding-left: 3rem;
+            padding-bottom: var(--space-md);
+            margin-bottom: var(--space-md);
+            border-bottom: 1px solid var(--color-light-sage);
+        }
+        
+        .instruction-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .instruction-item::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 32px;
+            height: 32px;
+            background: var(--color-sage);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        /* ============================================
+           MISSING INGREDIENTS ALERT
+           ============================================ */
+        .missing-alert {
+            background: linear-gradient(135deg, var(--color-terracotta-light) 0%, var(--color-terracotta) 100%);
+            color: white;
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+            text-align: center;
+        }
+        
+        .missing-alert h4 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .missing-alert p {
+            font-size: 0.9rem;
+            margin-bottom: var(--space-md);
+            opacity: 0.95;
+        }
+        
+        .missing-alert .btn {
+            background: white;
+            color: var(--color-terracotta);
+        }
+        
+        .missing-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            justify-content: center;
+            margin: var(--space-md) 0;
+        }
+        
+        .missing-tag {
+            background: rgba(255,255,255,0.25);
+            padding: var(--space-xs) var(--space-md);
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        /* ============================================
+           LOADING SPINNER
+           ============================================ */
+        .loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-2xl);
+        }
+        
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--color-light-sage);
+            border-top-color: var(--color-sage);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loader p {
+            margin-top: var(--space-md);
+            color: var(--color-warm-gray);
+            font-size: 0.9rem;
+        }
+        
+        /* ============================================
+           BACK BUTTON
+           ============================================ */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: var(--space-sm) var(--space-md);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--color-warm-gray);
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-bottom: var(--space-md);
+            transition: color var(--transition-fast);
+        }
+        
+        .back-btn:hover {
+            color: var(--color-charcoal);
+        }
+        
+        .nav-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+        
+        .nav-row .back-btn {
+            margin-bottom: 0;
+        }
+        
+        .pantry-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: var(--space-sm) var(--space-md);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--color-sage-dark);
+            background: var(--color-light-sage);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .pantry-link-btn:hover {
+            background: var(--color-sage);
+            color: white;
+        }
+        
+        /* ============================================
+           TOAST NOTIFICATIONS
+           ============================================ */
+        .toast-container {
+            position: fixed;
+            bottom: var(--space-lg);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+        
+        .toast {
+            background: var(--color-charcoal);
+            color: white;
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            animation: toastIn 0.3s ease-out, toastOut 0.3s ease-in 2.7s forwards;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .toast.success {
+            background: var(--color-success);
+        }
+        
+        .toast.error {
+            background: var(--color-danger);
+        }
+        
+        /* ============================================
+           SETTINGS
+           ============================================ */
+        .settings-note {
+            font-size: 0.85rem;
+            color: var(--color-warm-gray);
+            margin-top: var(--space-xs);
+        }
+        
+        /* ============================================
+           CUISINE PREFERENCES DISPLAY
+           ============================================ */
+        .cuisine-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            margin-top: var(--space-md);
+        }
+        
+        .cuisine-tag {
+            background: var(--color-light-sage);
+            color: var(--color-sage-dark);
+            padding: var(--space-xs) var(--space-md);
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+        
+        .cuisine-tag-delete {
+            background: none;
+            border: none;
+            color: var(--color-sage-dark);
+            cursor: pointer;
+            padding: 0;
+            font-size: 1rem;
+            line-height: 1;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            margin-left: 2px;
+        }
+        
+        .cuisine-tag-delete:hover {
+            opacity: 1;
+        }
+        
+        /* ============================================
+           API USAGE STATS
+           ============================================ */
+        .usage-stats {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        
+        .usage-stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--color-light-sage);
+        }
+        
+        .usage-stat-row:last-child {
+            border-bottom: none;
+        }
+        
+        .usage-stat-label {
+            color: var(--color-warm-gray);
+            font-size: 0.9rem;
+        }
+        
+        .usage-stat-value {
+            font-weight: 600;
+            color: var(--color-charcoal);
+        }
+        
+        .usage-total {
+            background: var(--color-light-sage);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            text-align: center;
+            margin-top: var(--space-sm);
+        }
+        
+        .usage-total-label {
+            font-size: 0.85rem;
+            color: var(--color-warm-gray);
+            margin-bottom: var(--space-xs);
+        }
+        
+        .usage-total-value {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--color-sage-dark);
+        }
+        
+        /* ============================================
+           QUICK ADD SECTION
+           ============================================ */
+        .quick-add-category {
+            margin-bottom: var(--space-lg);
+        }
+        
+        .quick-add-category:last-child {
+            margin-bottom: 0;
+        }
+        
+        .quick-add-category-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--color-warm-gray);
+            margin-bottom: var(--space-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .quick-add-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+        }
+        
+        .quick-add-btn {
+            padding: var(--space-sm) var(--space-md);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: var(--color-light-sage);
+            color: var(--color-sage-dark);
+            border: 2px solid transparent;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .quick-add-btn:hover {
+            background: var(--color-sage);
+            color: white;
+        }
+        
+        .quick-add-btn.added {
+            background: var(--color-sage);
+            color: white;
+            border-color: var(--color-sage-dark);
+        }
+        
+        .quick-add-btn.added::after {
+            content: ' ✓';
+        }
+        
+        /* ============================================
+           GROCERY LIST
+           ============================================ */
+        .grocery-list {
+            list-style: none;
+        }
+        
+        .grocery-item {
+            display: flex;
+            align-items: center;
+            padding: var(--space-md);
+            background: var(--color-light-sage);
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--space-sm);
+            gap: var(--space-sm);
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .grocery-item.completed {
+            background: #f0f0f0;
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        
+        .grocery-checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--color-sage);
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all var(--transition-fast);
+        }
+        
+        .grocery-checkbox:hover {
+            background: var(--color-light-sage);
+        }
+        
+        .grocery-item.completed .grocery-checkbox {
+            background: var(--color-sage);
+            color: white;
+        }
+        
+        .grocery-item-name {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .grocery-quick-add {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+        }
+        
+        .quick-grocery-btn {
+            padding: var(--space-xs) var(--space-sm);
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            background: white;
+            color: var(--color-warm-gray);
+            border: 1px solid var(--color-light-sage);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .quick-grocery-btn:hover {
+            border-color: var(--color-sage);
+            color: var(--color-sage-dark);
+        }
+        
+        /* ============================================
+           GROCERY SUGGESTION
+           ============================================ */
+        .meal-planner {
+            background: linear-gradient(135deg, var(--color-light-sage) 0%, #E0EAD8 100%);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .meal-count-control {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+        
+        .meal-count-label {
+            font-weight: 600;
+            color: var(--color-sage-dark);
+            white-space: nowrap;
+        }
+        
+        .meal-count-stepper {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            background: white;
+            border-radius: var(--radius-full);
+            padding: var(--space-xs);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .stepper-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: var(--color-sage);
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stepper-btn:hover {
+            background: var(--color-sage-dark);
+            transform: scale(1.05);
+        }
+        
+        .stepper-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .meal-count-value {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-sage-dark);
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .suggest-grocery-btn {
+            width: 100%;
+            padding: var(--space-md);
+            background: var(--color-terracotta);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+        
+        .suggest-grocery-btn:hover {
+            background: #A85A3A;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(196, 120, 74, 0.4);
+        }
+        
+        .suggest-grocery-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .suggested-items-container {
+            margin-top: var(--space-lg);
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .suggested-items-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-md);
+        }
+        
+        .suggested-items-title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-charcoal);
+        }
+        
+        .suggested-item {
+            display: flex;
+            align-items: center;
+            padding: var(--space-sm) var(--space-md);
+            background: white;
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--space-xs);
+            gap: var(--space-sm);
+            transition: all var(--transition-fast);
+            border: 2px solid transparent;
+        }
+        
+        .suggested-item:hover {
+            border-color: var(--color-sage);
+        }
+        
+        .suggested-item.selected {
+            background: var(--color-light-sage);
+            border-color: var(--color-sage);
+        }
+        
+        .suggested-item-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid var(--color-sage);
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all var(--transition-fast);
+            font-size: 0.8rem;
+        }
+        
+        .suggested-item.selected .suggested-item-checkbox {
+            background: var(--color-sage);
+            color: white;
+        }
+        
+        .suggested-item-info {
+            flex: 1;
+        }
+        
+        .suggested-item-name {
+            font-weight: 500;
+            color: var(--color-charcoal);
+        }
+        
+        .suggested-item-reason {
+            font-size: 0.8rem;
+            color: var(--color-warm-gray);
+            margin-top: 2px;
+        }
+        
+        .suggested-item-category {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            background: var(--color-terracotta-light);
+            color: #7A4A2A;
+            border-radius: var(--radius-full);
+            font-weight: 500;
+        }
+        
+        .add-suggested-btn {
+            margin-top: var(--space-md);
+            padding: var(--space-md);
+            width: 100%;
+            background: var(--color-sage);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+        }
+        
+        .add-suggested-btn:hover {
+            background: var(--color-sage-dark);
+        }
+        
+        .add-suggested-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .select-all-btn {
+            font-size: 0.85rem;
+            color: var(--color-sage);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: underline;
+        }
+        
+        .select-all-btn:hover {
+            color: var(--color-sage-dark);
+        }
+        
+        .suggestion-loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: var(--space-xl);
+            color: var(--color-warm-gray);
+        }
+        
+        .suggestion-loader .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--color-light-sage);
+            border-top-color: var(--color-sage);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: var(--space-sm);
+        }
+        
+        /* ============================================
+           MACROS DISPLAY
+           ============================================ */
+        .macros-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-sm);
+        }
+        
+        .macro-item {
+            text-align: center;
+            padding: var(--space-md);
+            background: var(--color-light-sage);
+            border-radius: var(--radius-md);
+        }
+        
+        .macro-value {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-sage-dark);
+        }
+        
+        .macro-label {
+            font-size: 0.75rem;
+            color: var(--color-warm-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: var(--space-xs);
+        }
+        
+        .macro-item.calories {
+            background: linear-gradient(135deg, var(--color-terracotta-light), var(--color-terracotta));
+        }
+        
+        .macro-item.calories .macro-value,
+        .macro-item.calories .macro-label {
+            color: white;
+        }
+        
+        /* ============================================
+           RECIPE LOG PREVIEW
+           ============================================ */
+        .recipe-log-preview {
+            background: #1a1a1a;
+            color: #00ff00;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 0.7rem;
+            padding: var(--space-md);
+            border-radius: var(--radius-sm);
+            overflow-x: auto;
+            white-space: pre;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .recipe-log-empty {
+            color: #666;
+            font-style: italic;
+        }
+        
+        /* ============================================
+           RECIPE HISTORY
+           ============================================ */
+        .history-item {
+            display: flex;
+            flex-direction: column;
+            padding: var(--space-md);
+            background: white;
+            border: 2px solid var(--color-light-sage);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-sm);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+        }
+        
+        .history-item:hover {
+            border-color: var(--color-sage);
+            background: var(--color-light-sage);
+            transform: translateX(4px);
+        }
+        
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: var(--space-sm);
+        }
+        
+        .history-item-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--color-charcoal);
+            flex: 1;
+        }
+        
+        .history-item-date {
+            font-size: 0.75rem;
+            color: var(--color-warm-gray);
+            white-space: nowrap;
+        }
+        
+        .history-item-macros {
+            display: flex;
+            gap: var(--space-xs);
+            margin-top: var(--space-sm);
+        }
+        
+        .history-macro {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            padding: 2px var(--space-sm);
+            background: var(--color-light-sage);
+            border-radius: var(--radius-full);
+            font-size: 0.7rem;
+            color: var(--color-sage-dark);
+        }
+        
+        .history-macro.calories {
+            background: var(--color-terracotta-light);
+            color: white;
+        }
+        
+        .history-empty {
+            text-align: center;
+            padding: var(--space-xl);
+            color: var(--color-warm-gray);
+        }
+        
+        .history-date-group {
+            margin-bottom: var(--space-lg);
+        }
+        
+        .history-date-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--color-warm-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--space-sm);
+            padding-bottom: var(--space-xs);
+            border-bottom: 1px solid var(--color-light-sage);
+        }
+        
+        /* ============================================
+           ANIMATIONS
+           ============================================ */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+        
+        /* ============================================
+           RESPONSIVE ADJUSTMENTS
+           ============================================ */
+        @media (max-width: 380px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .app-container {
+                padding: var(--space-sm);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- ============================================
+             HEADER
+             ============================================ -->
+        <header class="header">
+            <h1>PantryOS</h1>
+            <div class="header-egg">🍳</div>
+        </header>
+        
+        <!-- ============================================
+             HOME PAGE
+             ============================================ -->
+        <div id="home-page" class="page active">
+            <nav class="home-menu">
+                <button class="btn btn-primary" onclick="showPage('pantry')">
+                    <span class="menu-icon">🥬</span>
+                    View Pantry
+                </button>
+                <button class="btn btn-accent" onclick="startRecipeSuggestion()">
+                    <span class="menu-icon">✨</span>
+                    Suggest Recipe From Pantry
+                </button>
+                <button class="btn btn-secondary" onclick="showPage('new-recipe')">
+                    <span class="menu-icon">📝</span>
+                    Create New Recipe
+                </button>
+                <button class="btn btn-secondary" onclick="showPage('history')">
+                    <span class="menu-icon">📚</span>
+                    Recipe History
+                </button>
+                <button class="btn btn-secondary" onclick="showPage('grocery')">
+                    <span class="menu-icon">🛒</span>
+                    Grocery List
+                </button>
+                <button class="btn btn-secondary" onclick="showPage('settings')">
+                    <span class="menu-icon">⚙️</span>
+                    Settings
+                </button>
+            </nav>
+            
+            <!-- Cuisine preferences display -->
+            <div id="cuisine-preview" class="card" style="margin-top: var(--space-lg); display: none;">
+                <h3 class="card-title">Your Taste Profile</h3>
+                <div id="cuisine-tags" class="cuisine-stats"></div>
+            </div>
+        </div>
+        
+        <!-- ============================================
+             PANTRY PAGE
+             ============================================ -->
+        <div id="pantry-page" class="page">
+            <button class="back-btn" onclick="goBackFromPantry()">← Back</button>
+            
+            <!-- Quick Add Staples - shown when pantry is empty or few items -->
+            <div id="quick-add-section" class="card">
+                <div class="card-header">
+                    <h2 class="card-title">⚡ Quick Add Staples</h2>
+                </div>
+                <p style="color: var(--color-warm-gray); font-size: 0.9rem; margin-bottom: var(--space-md);">
+                    Tap items you have at home to quickly stock your pantry
+                </p>
+                
+                <!-- Category: Proteins -->
+                <div class="quick-add-category">
+                    <h4 class="quick-add-category-title">🥩 Proteins</h4>
+                    <div class="quick-add-grid" id="quick-proteins"></div>
+                </div>
+                
+                <!-- Category: Vegetables -->
+                <div class="quick-add-category">
+                    <h4 class="quick-add-category-title">🥬 Vegetables</h4>
+                    <div class="quick-add-grid" id="quick-vegetables"></div>
+                </div>
+                
+                <!-- Category: Dairy & Eggs -->
+                <div class="quick-add-category">
+                    <h4 class="quick-add-category-title">🥚 Dairy & Eggs</h4>
+                    <div class="quick-add-grid" id="quick-dairy"></div>
+                </div>
+                
+                <!-- Category: Grains & Carbs -->
+                <div class="quick-add-category">
+                    <h4 class="quick-add-category-title">🍚 Grains & Carbs</h4>
+                    <div class="quick-add-grid" id="quick-grains"></div>
+                </div>
+                
+                <!-- Category: Pantry Staples -->
+                <div class="quick-add-category">
+                    <h4 class="quick-add-category-title">🫙 Pantry Staples</h4>
+                    <div class="quick-add-grid" id="quick-staples"></div>
+                </div>
+                
+                <!-- Category: Spices & Seasonings -->
+                <div class="quick-add-category">
+                    <h4 class="quick-add-category-title">🧂 Spices & Seasonings</h4>
+                    <div class="quick-add-grid" id="quick-spices"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">➕ Add Custom Item</h2>
+                </div>
+                
+                <!-- Add item form -->
+                <form id="add-item-form" onsubmit="addPantryItem(event)">
+                    <div class="form-group">
+                        <label class="form-label">Item Name</label>
+                        <input type="text" id="item-name" class="form-input" placeholder="e.g., Chicken breast" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Quantity</label>
+                            <input type="number" id="item-qty" class="form-input" placeholder="1" min="0.1" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Unit</label>
+                            <input type="text" id="item-unit" class="form-input" placeholder="lbs, oz, cups..." required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add to Pantry</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">📦 Current Items (<span id="pantry-count">0</span>)</h3>
+                    <button class="btn btn-danger btn-small" onclick="resetPantry()">Reset All</button>
+                </div>
+                <ul id="pantry-list" class="pantry-list">
+                    <!-- Populated by JavaScript -->
+                </ul>
+                <div id="pantry-empty" class="pantry-empty" style="display: none;">
+                    <p>Your pantry is empty.<br>Use Quick Add above to get started!</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ============================================
+             RECIPE SUGGESTION PAGE
+             ============================================ -->
+        <div id="suggest-page" class="page">
+            <div class="nav-row">
+                <button class="back-btn" onclick="goBackFromSuggest()">← Back</button>
+                <button class="pantry-link-btn" onclick="viewPantryFromSuggest()">🥬 View Pantry</button>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">✨ Recipe Suggestions</h2>
+                <p style="color: var(--color-warm-gray); margin-bottom: var(--space-md);">
+                    Based on your pantry and preferences
+                </p>
+                
+                <!-- Loading state -->
+                <div id="suggest-loader" class="loader" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Generating delicious ideas...</p>
+                </div>
+                
+                <!-- Recipe titles -->
+                <div id="recipe-titles">
+                    <!-- Populated by JavaScript -->
+                </div>
+                
+                <!-- Generate new recipes button -->
+                <button id="new-titles-btn" class="btn btn-secondary" onclick="generateRecipeTitles()" style="margin-top: var(--space-md); display: none;">
+                    🔄 Generate 3 New Recipes
+                </button>
+            </div>
+        </div>
+        
+        <!-- ============================================
+             FULL RECIPE PAGE
+             ============================================ -->
+        <div id="recipe-page" class="page">
+            <div class="nav-row">
+                <button class="back-btn" onclick="goBackFromRecipe()">← Back to Suggestions</button>
+                <button class="pantry-link-btn" onclick="viewPantryFromRecipe()">🥬 View Pantry</button>
+            </div>
+            
+            <!-- Recipe loader -->
+            <div id="recipe-loader" class="loader" style="display: none;">
+                <div class="spinner"></div>
+                <p>Crafting your recipe...</p>
+            </div>
+            
+            <!-- Recipe content -->
+            <div id="recipe-content" class="card" style="display: none;">
+                <div class="recipe-header">
+                    <h2 id="recipe-title-display"></h2>
+                    <div class="recipe-meta">
+                        <span id="recipe-time">⏱️ -- min</span>
+                        <span id="recipe-servings">👤 1 serving</span>
+                        <span id="recipe-cuisine">🌍 --</span>
+                    </div>
+                </div>
+                
+                <!-- Missing ingredients alert -->
+                <div id="missing-alert" class="missing-alert" style="display: none;">
+                    <h4 id="missing-alert-title">Almost there! 🏃</h4>
+                    <p id="missing-alert-text">You're only missing a few ingredients and you live 5 minutes from Whole Foods — go grab them!</p>
+                    <div id="missing-list" class="missing-list"></div>
+                    <div style="display: flex; flex-direction: column; gap: var(--space-sm); margin-top: var(--space-md);">
+                        <button class="btn" onclick="addMissingToGroceryList()">🛒 Add to Grocery List</button>
+                        <button class="btn" style="background: rgba(255,255,255,0.2);" onclick="markIngredientsBought()">✓ I already have them</button>
+                    </div>
+                </div>
+                
+                <!-- Ingredients section -->
+                <div class="recipe-section">
+                    <h3>Ingredients</h3>
+                    <ul id="ingredients-list" class="ingredient-list">
+                        <!-- Populated by JavaScript -->
+                    </ul>
+                </div>
+                
+                <!-- Instructions section -->
+                <div class="recipe-section">
+                    <h3>Instructions</h3>
+                    <ol id="instructions-list" class="instruction-list">
+                        <!-- Populated by JavaScript -->
+                    </ol>
+                </div>
+                
+                <!-- Macros section -->
+                <div class="recipe-section">
+                    <h3>Nutrition (per serving)</h3>
+                    <div id="macros-display" class="macros-grid">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Modify Recipe section -->
+                <div class="recipe-section modify-recipe-section">
+                    <h3>✏️ Modify Recipe</h3>
+                    <p style="color: var(--color-warm-gray); font-size: 0.9rem; margin-bottom: var(--space-sm);">
+                        Want to make changes? Describe what you'd like to adjust.
+                    </p>
+                    <textarea id="modify-recipe-input" class="form-input" rows="3" placeholder="e.g., Make it spicier, substitute chicken for tofu, add more vegetables, reduce the salt..."></textarea>
+                    <button class="btn btn-secondary" onclick="modifyRecipe()" style="margin-top: var(--space-sm);">
+                        🔄 Update Recipe
+                    </button>
+                </div>
+                
+                <!-- Action buttons -->
+                <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+                    <button id="cook-btn" class="btn btn-accent" onclick="cookRecipe()">
+                        👨‍🍳 Cook This Recipe
+                    </button>
+                    <button id="cook-anyway-btn" class="btn btn-warning" onclick="cookRecipeAnyway()" style="display: none;">
+                        🍳 Cook Anyway (Missing Ingredients)
+                    </button>
+                    <button class="btn btn-secondary" onclick="showPage('suggest')">
+                        ← Choose Different Recipe
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ============================================
+             NEW RECIPE PAGE
+             ============================================ -->
+        <div id="new-recipe-page" class="page">
+            <button class="back-btn" onclick="showPage('home')">← Back</button>
+            
+            <div class="card">
+                <h2 class="card-title">📝 Create New Recipe</h2>
+                <p style="color: var(--color-warm-gray); margin-bottom: var(--space-md);">
+                    Tell us what you're craving or let AI surprise you
+                </p>
+                
+                <div class="form-group">
+                    <label class="form-label">What do you want to make?</label>
+                    <input type="text" id="custom-request" class="form-input" placeholder="e.g., Something with salmon and lemon...">
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+                    <button class="btn btn-accent" onclick="generateCustomRecipe()">
+                        🔍 Find Recipes
+                    </button>
+                    <button class="btn btn-secondary" onclick="generateRandomRecipe()">
+                        🎲 Surprise Me!
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Loading state -->
+            <div id="new-recipe-loader" class="loader" style="display: none;">
+                <div class="spinner"></div>
+                <p>Generating ideas...</p>
+            </div>
+            
+            <!-- Recipe titles for new recipe -->
+            <div id="new-recipe-titles" class="card" style="display: none;">
+                <h3 class="card-title">Choose a Recipe</h3>
+                <div id="new-recipe-titles-list"></div>
+                <button class="btn btn-secondary" onclick="brainstormMoreRecipes()" style="margin-top: var(--space-md);">
+                    🔄 Generate More Options
+                </button>
+            </div>
+        </div>
+        
+        <!-- ============================================
+             GROCERY LIST PAGE
+             ============================================ -->
+        <div id="grocery-page" class="page">
+            <button class="back-btn" onclick="showPage('home')">← Back</button>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🛒 Grocery List</h2>
+                </div>
+                <p style="color: var(--color-warm-gray); font-size: 0.9rem; margin-bottom: var(--space-md);">
+                    Your shopping list for Whole Foods or Trader Joe's
+                </p>
+                
+                <!-- Add item form -->
+                <form id="add-grocery-form" onsubmit="addGroceryItem(event)">
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 2;">
+                            <input type="text" id="grocery-item-name" class="form-input" placeholder="Item name..." required>
+                        </div>
+                        <div class="form-group" style="flex: 0 0 auto;">
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- Quick add common items -->
+                <div style="margin-top: var(--space-md);">
+                    <p class="form-label">Quick add:</p>
+                    <div class="grocery-quick-add">
+                        <button class="quick-grocery-btn" onclick="quickAddGrocery('Chicken breast')">Chicken</button>
+                        <button class="quick-grocery-btn" onclick="quickAddGrocery('Salmon')">Salmon</button>
+                        <button class="quick-grocery-btn" onclick="quickAddGrocery('Eggs')">Eggs</button>
+                        <button class="quick-grocery-btn" onclick="quickAddGrocery('Spinach')">Spinach</button>
+                        <button class="quick-grocery-btn" onclick="quickAddGrocery('Avocado')">Avocado</button>
+                        <button class="quick-grocery-btn" onclick="quickAddGrocery('Garlic')">Garlic</button>
+                        <button class="quick-grocery-btn" onclick="quickAddGrocery('Onion')">Onion</button>
+                        <button class="quick-grocery-btn" onclick="quickAddGrocery('Olive oil')">Olive oil</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Meal Planner & AI Suggestion -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">✨ Smart Grocery Suggestions</h3>
+                </div>
+                <p style="color: var(--color-warm-gray); font-size: 0.9rem; margin-bottom: var(--space-md);">
+                    Let AI suggest groceries based on your pantry and meal goals
+                </p>
+                
+                <div class="meal-planner">
+                    <div class="meal-count-control">
+                        <span class="meal-count-label">Meals to plan:</span>
+                        <div class="meal-count-stepper">
+                            <button class="stepper-btn" onclick="adjustMealCount(-1)" id="meal-decrease-btn">−</button>
+                            <span class="meal-count-value" id="meal-count-display">5</span>
+                            <button class="stepper-btn" onclick="adjustMealCount(1)" id="meal-increase-btn">+</button>
+                        </div>
+                    </div>
+                    
+                    <button class="suggest-grocery-btn" onclick="suggestGroceryList()" id="suggest-grocery-btn">
+                        🧠 Generate Smart List
+                    </button>
+                </div>
+                
+                <!-- Suggested Items Container -->
+                <div id="suggested-items-container" style="display: none;">
+                    <div class="suggested-items-header">
+                        <span class="suggested-items-title">Suggested Items</span>
+                        <button class="select-all-btn" onclick="toggleAllSuggested()" id="select-all-btn">Select All</button>
+                    </div>
+                    <div id="suggested-items-list">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                    <button class="add-suggested-btn" onclick="addSelectedToGroceryList()" id="add-suggested-btn" disabled>
+                        Add Selected to List
+                    </button>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="suggestion-loader" class="suggestion-loader" style="display: none;">
+                    <div class="spinner"></div>
+                    <span>Analyzing your pantry...</span>
+                </div>
+            </div>
+            
+            <!-- Grocery List Items -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">📋 To Buy</h3>
+                </div>
+                
+                <ul id="grocery-list" class="grocery-list">
+                    <!-- Populated by JavaScript -->
+                </ul>
+                
+                <div id="grocery-empty" class="pantry-empty" style="display: none;">
+                    <p>Your grocery list is empty.<br>Add items above!</p>
+                </div>
+                
+                <!-- Action buttons -->
+                <div style="display: flex; flex-direction: column; gap: var(--space-sm); margin-top: var(--space-lg);">
+                    <button class="btn btn-accent" onclick="addAllToPantry()">
+                        ✓ Done Shopping — Add All to Pantry
+                    </button>
+                    <button class="btn btn-danger btn-small" onclick="clearAllGroceries()">
+                        Clear Entire List
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ============================================
+             SETTINGS PAGE
+             ============================================ -->
+        <div id="settings-page" class="page">
+            <button class="back-btn" onclick="showPage('home')">← Back</button>
+            
+            <div class="card">
+                <h2 class="card-title">⚙️ Settings</h2>
+                
+                <form id="settings-form" onsubmit="saveSettings(event)">
+                    <div class="form-group">
+                        <label class="form-label">OpenAI API Key</label>
+                        <input type="password" id="api-key" class="form-input" placeholder="sk-...">
+                        <p class="settings-note">Your API key is stored locally and never shared.</p>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                </form>
+            </div>
+            
+            <!-- API Usage Stats -->
+            <div class="card">
+                <h3 class="card-title">💰 API Usage</h3>
+                <p style="color: var(--color-warm-gray); font-size: 0.9rem; margin-bottom: var(--space-md);">
+                    Track your OpenAI API spending
+                </p>
+                <div id="api-usage-stats" class="usage-stats">
+                    <!-- Populated by JavaScript -->
+                </div>
+                <button class="btn btn-secondary btn-small" onclick="resetApiUsage()" style="margin-top: var(--space-md);">
+                    Reset Usage Stats
+                </button>
+            </div>
+            
+            <!-- Cuisine history -->
+            <div class="card">
+                <h3 class="card-title">🍽️ Cuisine Preferences</h3>
+                <p style="color: var(--color-warm-gray); font-size: 0.9rem; margin-bottom: var(--space-md);">
+                    Based on recipes you've cooked
+                </p>
+                <div id="cuisine-history" class="cuisine-stats">
+                    <span class="cuisine-tag" style="background: #f0f0f0; color: #999;">No cooking history yet</span>
+                </div>
+                <button class="btn btn-secondary btn-small" onclick="resetCuisineHistory()" style="margin-top: var(--space-md);">
+                    Reset Preferences
+                </button>
+            </div>
+            
+            <!-- Recipe Log -->
+            <div class="card">
+                <h3 class="card-title">📊 Recipe Log</h3>
+                <p style="color: var(--color-warm-gray); font-size: 0.9rem; margin-bottom: var(--space-md);">
+                    Your cooking history with nutrition data (CSV format)
+                </p>
+                <div id="recipe-log-stats" class="usage-stats">
+                    <!-- Populated by JavaScript -->
+                </div>
+                <div id="recipe-log-preview" class="recipe-log-preview" style="margin-top: var(--space-md);">
+                    <!-- Populated by JavaScript -->
+                </div>
+                <div style="display: flex; gap: var(--space-sm); margin-top: var(--space-md); flex-wrap: wrap;">
+                    <button class="btn btn-primary btn-small" onclick="exportRecipeLog()">
+                        📥 Export CSV
+                    </button>
+                    <button class="btn btn-secondary btn-small" onclick="copyRecipeLog()">
+                        📋 Copy to Clipboard
+                    </button>
+                    <button class="btn btn-danger btn-small" onclick="clearRecipeLog()">
+                        Clear Log
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ============================================
+             RECIPE HISTORY PAGE
+             ============================================ -->
+        <div id="history-page" class="page">
+            <button class="back-btn" onclick="showPage('home')">← Back</button>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📚 Recipe History</h2>
+                    <button class="btn btn-danger btn-small" onclick="clearRecipeHistory()" id="clear-history-btn" style="display: none;">
+                        Clear All
+                    </button>
+                </div>
+                <p style="color: var(--color-warm-gray); font-size: 0.9rem; margin-bottom: var(--space-md);">
+                    All recipes you've explored. Tap to cook again!
+                </p>
+                
+                <div id="history-list">
+                    <!-- Populated by JavaScript -->
+                </div>
+                
+                <div id="history-empty" class="history-empty" style="display: none;">
+                    <p>📭 No recipes explored yet.<br>Start suggesting recipes to build your history!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast container -->
+    <div id="toast-container" class="toast-container"></div>
+    
+    <!-- ============================================
+         JAVASCRIPT
+         ============================================ -->
+    <script>
+        // ============================================
+        // CONSTANTS & CONFIGURATION
+        // ============================================
+        
+        // User's cooking preferences - ALWAYS included in AI prompts
+        const USER_PREFERENCES = `
+USER COOKING PREFERENCES (MUST FOLLOW):
+- High-protein meals
+- Healthy cooking style
+- AVOID beef and pork entirely
+- Prefer using stove or microwave; avoid oven unless absolutely necessary
+- Total cooking time must be under 30 minutes
+- Ingredients should be available at Whole Foods or Trader Joe's
+- Use organic produce when possible
+- Servings: exactly 1 person (can optionally mention scaling)
+- User is an experienced cook - no need to over-explain basic techniques
+- User lives 5 minutes from grocery store - OK to suggest buying 1-2 missing ingredients
+`;
+        
+        // LocalStorage keys
+        const STORAGE_KEYS = {
+            PANTRY: 'pantryos_pantry',
+            API_KEY: 'pantryos_api_key',
+            CUISINE_HISTORY: 'pantryos_cuisine_history',
+            API_USAGE: 'pantryos_api_usage',
+            GROCERY_LIST: 'pantryos_grocery_list',
+            RECIPE_LOG: 'pantryos_recipe_log_csv',
+            RECIPE_HISTORY: 'pantryos_recipe_history'
+        };
+        
+        // CSV header for recipe log
+        const RECIPE_LOG_HEADER = 'date,time,recipe_name,cuisine,cooking_time_min,calories,protein_g,carbs_g,fat_g';
+        
+        // Quick add staples - common items for easy pantry setup
+        const QUICK_ADD_STAPLES = {
+            proteins: [
+                { name: 'Chicken breast', qty: 1, unit: 'lb' },
+                { name: 'Chicken thighs', qty: 1, unit: 'lb' },
+                { name: 'Salmon fillet', qty: 1, unit: 'lb' },
+                { name: 'Shrimp', qty: 1, unit: 'lb' },
+                { name: 'Eggs', qty: 12, unit: 'count' },
+                { name: 'Tofu', qty: 1, unit: 'block' },
+                { name: 'Ground turkey', qty: 1, unit: 'lb' },
+                { name: 'Cod fillet', qty: 1, unit: 'lb' },
+                { name: 'Tuna (canned)', qty: 2, unit: 'cans' }
+            ],
+            vegetables: [
+                { name: 'Spinach', qty: 1, unit: 'bag' },
+                { name: 'Broccoli', qty: 1, unit: 'head' },
+                { name: 'Garlic', qty: 1, unit: 'head' },
+                { name: 'Onion', qty: 3, unit: 'count' },
+                { name: 'Bell peppers', qty: 3, unit: 'count' },
+                { name: 'Tomatoes', qty: 4, unit: 'count' },
+                { name: 'Zucchini', qty: 2, unit: 'count' },
+                { name: 'Mushrooms', qty: 8, unit: 'oz' },
+                { name: 'Avocado', qty: 2, unit: 'count' },
+                { name: 'Carrots', qty: 1, unit: 'bag' },
+                { name: 'Kale', qty: 1, unit: 'bunch' },
+                { name: 'Green beans', qty: 1, unit: 'lb' },
+                { name: 'Asparagus', qty: 1, unit: 'bunch' },
+                { name: 'Cucumber', qty: 2, unit: 'count' },
+                { name: 'Ginger', qty: 1, unit: 'piece' },
+                { name: 'Scallions', qty: 1, unit: 'bunch' }
+            ],
+            dairy: [
+                { name: 'Greek yogurt', qty: 32, unit: 'oz' },
+                { name: 'Butter', qty: 1, unit: 'stick' },
+                { name: 'Parmesan cheese', qty: 4, unit: 'oz' },
+                { name: 'Feta cheese', qty: 4, unit: 'oz' },
+                { name: 'Milk', qty: 1, unit: 'quart' },
+                { name: 'Heavy cream', qty: 1, unit: 'cup' },
+                { name: 'Mozzarella', qty: 8, unit: 'oz' }
+            ],
+            grains: [
+                { name: 'Rice', qty: 2, unit: 'cups' },
+                { name: 'Quinoa', qty: 1, unit: 'cup' },
+                { name: 'Pasta', qty: 1, unit: 'lb' },
+                { name: 'Bread', qty: 1, unit: 'loaf' },
+                { name: 'Tortillas', qty: 8, unit: 'count' },
+                { name: 'Oats', qty: 1, unit: 'container' },
+                { name: 'Couscous', qty: 1, unit: 'box' }
+            ],
+            staples: [
+                { name: 'Olive oil', qty: 1, unit: 'bottle' },
+                { name: 'Soy sauce', qty: 1, unit: 'bottle' },
+                { name: 'Chicken broth', qty: 32, unit: 'oz' },
+                { name: 'Coconut milk', qty: 1, unit: 'can' },
+                { name: 'Lemon', qty: 3, unit: 'count' },
+                { name: 'Lime', qty: 3, unit: 'count' },
+                { name: 'Honey', qty: 1, unit: 'bottle' },
+                { name: 'Sesame oil', qty: 1, unit: 'bottle' },
+                { name: 'Rice vinegar', qty: 1, unit: 'bottle' },
+                { name: 'Fish sauce', qty: 1, unit: 'bottle' },
+                { name: 'Sriracha', qty: 1, unit: 'bottle' },
+                { name: 'Tomato paste', qty: 1, unit: 'tube' },
+                { name: 'Dijon mustard', qty: 1, unit: 'jar' }
+            ],
+            spices: [
+                { name: 'Salt', qty: 1, unit: 'container' },
+                { name: 'Black pepper', qty: 1, unit: 'container' },
+                { name: 'Cumin', qty: 1, unit: 'jar' },
+                { name: 'Paprika', qty: 1, unit: 'jar' },
+                { name: 'Italian seasoning', qty: 1, unit: 'jar' },
+                { name: 'Red pepper flakes', qty: 1, unit: 'jar' },
+                { name: 'Garlic powder', qty: 1, unit: 'jar' },
+                { name: 'Onion powder', qty: 1, unit: 'jar' },
+                { name: 'Turmeric', qty: 1, unit: 'jar' },
+                { name: 'Cinnamon', qty: 1, unit: 'jar' },
+                { name: 'Curry powder', qty: 1, unit: 'jar' }
+            ]
+        };
+        
+        // GPT-5.1 pricing (per 1M tokens) - update these if pricing changes
+        const API_PRICING = {
+            input: 1.25,   // $1.25 per 1M input tokens
+            output: 10.00  // $10.00 per 1M output tokens
+        };
+        
+        // ============================================
+        // STATE MANAGEMENT
+        // ============================================
+        
+        // Current app state
+        let state = {
+            pantry: [],
+            groceryList: [],
+            cuisineHistory: [],
+            recipeHistory: [],
+            currentRecipe: null,
+            missingIngredients: [],
+            isFromNewRecipe: false, // Track if we came from "New Recipe" page
+            cachedRecipeTitles: null, // Cache recipe suggestions for navigation
+            cachedRecipeTitlesHtml: null, // Cache the rendered HTML
+            returnToPage: null, // Track where to return after viewing pantry
+            apiUsage: {
+                totalInputTokens: 0,
+                totalOutputTokens: 0,
+                totalCalls: 0,
+                lastReset: null
+            }
+        };
+        
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFromStorage();
+            initQuickAddButtons();
+            renderPantryList();
+            renderGroceryList();
+            renderCuisineHistory();
+            renderApiUsage();
+            renderRecipeLogPreview();
+            updateCuisinePreview();
+            
+            // Load API key into settings field
+            const apiKey = localStorage.getItem(STORAGE_KEYS.API_KEY);
+            if (apiKey) {
+                document.getElementById('api-key').value = apiKey;
+            }
+        });
+        
+        // Load all data from localStorage
+        function loadFromStorage() {
+            // Load pantry
+            const pantryData = localStorage.getItem(STORAGE_KEYS.PANTRY);
+            if (pantryData) {
+                state.pantry = JSON.parse(pantryData);
+            }
+            
+            // Load cuisine history
+            const cuisineData = localStorage.getItem(STORAGE_KEYS.CUISINE_HISTORY);
+            if (cuisineData) {
+                state.cuisineHistory = JSON.parse(cuisineData);
+            }
+            
+            // Load API usage
+            const usageData = localStorage.getItem(STORAGE_KEYS.API_USAGE);
+            if (usageData) {
+                state.apiUsage = JSON.parse(usageData);
+            } else {
+                state.apiUsage.lastReset = new Date().toISOString();
+            }
+            
+            // Load grocery list
+            const groceryData = localStorage.getItem(STORAGE_KEYS.GROCERY_LIST);
+            if (groceryData) {
+                state.groceryList = JSON.parse(groceryData);
+            }
+            
+            // Load recipe history
+            const historyData = localStorage.getItem(STORAGE_KEYS.RECIPE_HISTORY);
+            if (historyData) {
+                state.recipeHistory = JSON.parse(historyData);
+            }
+        }
+        
+        // Save grocery list to localStorage
+        function saveGroceryList() {
+            localStorage.setItem(STORAGE_KEYS.GROCERY_LIST, JSON.stringify(state.groceryList));
+        }
+        
+        // Save API usage to localStorage
+        function saveApiUsage() {
+            localStorage.setItem(STORAGE_KEYS.API_USAGE, JSON.stringify(state.apiUsage));
+        }
+        
+        // Save pantry to localStorage
+        function savePantry() {
+            localStorage.setItem(STORAGE_KEYS.PANTRY, JSON.stringify(state.pantry));
+        }
+        
+        // Save cuisine history to localStorage
+        function saveCuisineHistory() {
+            localStorage.setItem(STORAGE_KEYS.CUISINE_HISTORY, JSON.stringify(state.cuisineHistory));
+        }
+        
+        // Save recipe history to localStorage
+        function saveRecipeHistory() {
+            localStorage.setItem(STORAGE_KEYS.RECIPE_HISTORY, JSON.stringify(state.recipeHistory));
+        }
+        
+        // ============================================
+        // PAGE NAVIGATION
+        // ============================================
+        
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show requested page
+            document.getElementById(`${pageId}-page`).classList.add('active');
+            
+            // Page-specific logic
+            if (pageId === 'home') {
+                updateCuisinePreview();
+            } else if (pageId === 'pantry') {
+                renderPantryList();
+            } else if (pageId === 'settings') {
+                renderCuisineHistory();
+                renderApiUsage();
+                renderRecipeLogPreview();
+            } else if (pageId === 'grocery') {
+                renderGroceryList();
+            } else if (pageId === 'history') {
+                renderRecipeHistory();
+            }
+        }
+        
+        // Navigation helpers to preserve recipe cache
+        function goBackFromSuggest() {
+            // Clear cache when going back to home
+            state.cachedRecipeTitles = null;
+            state.cachedRecipeTitlesHtml = null;
+            showPage('home');
+        }
+        
+        function goBackFromRecipe() {
+            // Keep cache, just go back to suggestions
+            showPage('suggest');
+            // Restore cached titles if available
+            if (state.cachedRecipeTitlesHtml) {
+                const titlesContainer = document.getElementById('recipe-titles');
+                const loader = document.getElementById('suggest-loader');
+                const newTitlesBtn = document.getElementById('new-titles-btn');
+                
+                loader.style.display = 'none';
+                titlesContainer.innerHTML = state.cachedRecipeTitlesHtml;
+                newTitlesBtn.style.display = 'block';
+            }
+        }
+        
+        function viewPantryFromSuggest() {
+            // Save current input values before navigating
+            saveTitlesCache();
+            state.returnToPage = 'suggest';
+            showPage('pantry');
+        }
+        
+        function viewPantryFromRecipe() {
+            // Keep cache and recipe when viewing pantry
+            state.returnToPage = 'recipe';
+            showPage('pantry');
+        }
+        
+        function goBackFromPantry() {
+            const returnTo = state.returnToPage || 'home';
+            state.returnToPage = null;
+            
+            if (returnTo === 'suggest') {
+                // Return to suggestions with cached titles
+                showPage('suggest');
+                if (state.cachedRecipeTitlesHtml) {
+                    const titlesContainer = document.getElementById('recipe-titles');
+                    const loader = document.getElementById('suggest-loader');
+                    const newTitlesBtn = document.getElementById('new-titles-btn');
+                    
+                    loader.style.display = 'none';
+                    titlesContainer.innerHTML = state.cachedRecipeTitlesHtml;
+                    newTitlesBtn.style.display = 'block';
+                }
+            } else if (returnTo === 'recipe') {
+                // Return to recipe view with cached recipe
+                showPage('recipe');
+                if (state.currentRecipe) {
+                    displayRecipe(state.currentRecipe);
+                }
+            } else {
+                showPage('home');
+            }
+        }
+        
+        // ============================================
+        // PANTRY MANAGEMENT
+        // ============================================
+        
+        // Add item to pantry
+        function addPantryItem(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('item-name').value.trim();
+            const quantity = parseFloat(document.getElementById('item-qty').value);
+            const unit = document.getElementById('item-unit').value.trim();
+            
+            if (!name || !quantity || !unit) {
+                showToast('Please fill all fields', 'error');
+                return;
+            }
+            
+            // Check if item already exists (case-insensitive)
+            const existingIndex = state.pantry.findIndex(
+                item => item.name.toLowerCase() === name.toLowerCase()
+            );
+            
+            if (existingIndex >= 0) {
+                // Update existing item quantity
+                state.pantry[existingIndex].quantity += quantity;
+                state.pantry[existingIndex].unit = unit; // Update unit in case it changed
+                showToast(`Updated ${name} quantity`);
+            } else {
+                // Add new item
+                state.pantry.push({ name, quantity, unit });
+                showToast(`Added ${name} to pantry`);
+            }
+            
+            savePantry();
+            renderPantryList();
+            
+            // Clear form
+            document.getElementById('add-item-form').reset();
+        }
+        
+        // Remove item from pantry
+        function removePantryItem(index) {
+            const item = state.pantry[index];
+            state.pantry.splice(index, 1);
+            savePantry();
+            renderPantryList();
+            showToast(`Removed ${item.name}`);
+        }
+        
+        // Reset entire pantry
+        function resetPantry() {
+            if (confirm('Are you sure you want to clear your entire pantry?')) {
+                state.pantry = [];
+                savePantry();
+                renderPantryList();
+                showToast('Pantry cleared');
+            }
+        }
+        
+        // Render pantry list UI
+        function renderPantryList() {
+            const listEl = document.getElementById('pantry-list');
+            const emptyEl = document.getElementById('pantry-empty');
+            
+            if (state.pantry.length === 0) {
+                listEl.innerHTML = '';
+                emptyEl.style.display = 'block';
+                return;
+            }
+            
+            emptyEl.style.display = 'none';
+            listEl.innerHTML = state.pantry.map((item, index) => `
+                <li class="pantry-item">
+                    <div class="pantry-item-info">
+                        <span class="pantry-item-name">${escapeHtml(item.name)}</span>
+                        <span class="pantry-item-qty">${item.quantity} ${escapeHtml(item.unit)}</span>
+                    </div>
+                    <button class="btn btn-danger btn-icon" onclick="removePantryItem(${index})">✕</button>
+                </li>
+            `).join('');
+            
+            // Update pantry count
+            const countEl = document.getElementById('pantry-count');
+            if (countEl) countEl.textContent = state.pantry.length;
+            
+            // Update quick add button states
+            updateQuickAddStates();
+        }
+        
+        // ============================================
+        // QUICK ADD STAPLES
+        // ============================================
+        
+        // Initialize quick add buttons
+        function initQuickAddButtons() {
+            const categories = {
+                'quick-proteins': QUICK_ADD_STAPLES.proteins,
+                'quick-vegetables': QUICK_ADD_STAPLES.vegetables,
+                'quick-dairy': QUICK_ADD_STAPLES.dairy,
+                'quick-grains': QUICK_ADD_STAPLES.grains,
+                'quick-staples': QUICK_ADD_STAPLES.staples,
+                'quick-spices': QUICK_ADD_STAPLES.spices
+            };
+            
+            Object.entries(categories).forEach(([containerId, items]) => {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                
+                container.innerHTML = items.map(item => `
+                    <button class="quick-add-btn" data-name="${escapeHtml(item.name)}" 
+                            onclick="quickAddToPantry('${escapeHtml(item.name).replace(/'/g, "\\'")}', ${item.qty}, '${item.unit}')">
+                        ${escapeHtml(item.name)}
+                    </button>
+                `).join('');
+            });
+            
+            updateQuickAddStates();
+        }
+        
+        // Update quick add button states based on pantry contents
+        function updateQuickAddStates() {
+            document.querySelectorAll('.quick-add-btn').forEach(btn => {
+                const name = btn.dataset.name;
+                const inPantry = state.pantry.some(item => 
+                    item.name.toLowerCase() === name.toLowerCase()
+                );
+                btn.classList.toggle('added', inPantry);
+            });
+        }
+        
+        // Quick add item to pantry
+        function quickAddToPantry(name, qty, unit) {
+            const existingIndex = state.pantry.findIndex(
+                item => item.name.toLowerCase() === name.toLowerCase()
+            );
+            
+            if (existingIndex >= 0) {
+                // Remove if already in pantry (toggle behavior)
+                state.pantry.splice(existingIndex, 1);
+                showToast(`Removed ${name}`);
+            } else {
+                // Add to pantry
+                state.pantry.push({ name, quantity: qty, unit });
+                showToast(`Added ${name}`);
+            }
+            
+            savePantry();
+            renderPantryList();
+        }
+        
+        // ============================================
+        // GROCERY LIST
+        // ============================================
+        
+        // Add item to grocery list
+        function addGroceryItem(event) {
+            event.preventDefault();
+            
+            const nameInput = document.getElementById('grocery-item-name');
+            const name = nameInput.value.trim();
+            
+            if (!name) return;
+            
+            // Check if already in list
+            const exists = state.groceryList.some(
+                item => item.name.toLowerCase() === name.toLowerCase()
+            );
+            
+            if (exists) {
+                showToast('Item already in list');
+                return;
+            }
+            
+            state.groceryList.push({ name, completed: false });
+            saveGroceryList();
+            renderGroceryList();
+            nameInput.value = '';
+            showToast(`Added ${name}`);
+        }
+        
+        // Quick add to grocery list
+        function quickAddGrocery(name) {
+            const exists = state.groceryList.some(
+                item => item.name.toLowerCase() === name.toLowerCase()
+            );
+            
+            if (exists) {
+                showToast('Already in list');
+                return;
+            }
+            
+            state.groceryList.push({ name, completed: false });
+            saveGroceryList();
+            renderGroceryList();
+            showToast(`Added ${name}`);
+        }
+        
+        // Toggle grocery item completion
+        function toggleGroceryItem(index) {
+            state.groceryList[index].completed = !state.groceryList[index].completed;
+            saveGroceryList();
+            renderGroceryList();
+        }
+        
+        // Remove grocery item
+        function removeGroceryItem(index) {
+            state.groceryList.splice(index, 1);
+            saveGroceryList();
+            renderGroceryList();
+        }
+        
+        // Clear completed grocery items
+        function clearCompletedGroceries() {
+            state.groceryList = state.groceryList.filter(item => !item.completed);
+            saveGroceryList();
+            renderGroceryList();
+            showToast('Cleared completed items');
+        }
+        
+        // Clear all grocery items
+        function clearAllGroceries() {
+            if (confirm('Clear entire grocery list?')) {
+                state.groceryList = [];
+                saveGroceryList();
+                renderGroceryList();
+                showToast('List cleared');
+            }
+        }
+        
+        // Add all grocery items to pantry (done shopping)
+        function addAllToPantry() {
+            if (state.groceryList.length === 0) {
+                showToast('Nothing to add');
+                return;
+            }
+            
+            let added = 0;
+            state.groceryList.forEach(item => {
+                const existingIndex = state.pantry.findIndex(
+                    p => p.name.toLowerCase() === item.name.toLowerCase()
+                );
+                
+                if (existingIndex >= 0) {
+                    state.pantry[existingIndex].quantity += 1;
+                } else {
+                    state.pantry.push({ name: item.name, quantity: 1, unit: 'count' });
+                }
+                added++;
+            });
+            
+            state.groceryList = [];
+            savePantry();
+            saveGroceryList();
+            renderPantryList();
+            renderGroceryList();
+            showToast(`Added ${added} items to pantry! 🎉`, 'success');
+        }
+        
+        // Render grocery list
+        function renderGroceryList() {
+            const listEl = document.getElementById('grocery-list');
+            const emptyEl = document.getElementById('grocery-empty');
+            const countEl = document.getElementById('grocery-count');
+            
+            if (!listEl) return;
+            
+            const uncompleted = state.groceryList.filter(i => !i.completed).length;
+            if (countEl) countEl.textContent = uncompleted;
+            
+            if (state.groceryList.length === 0) {
+                listEl.innerHTML = '';
+                emptyEl.style.display = 'block';
+                return;
+            }
+            
+            emptyEl.style.display = 'none';
+            
+            // Sort: uncompleted first
+            const sorted = [...state.groceryList].sort((a, b) => a.completed - b.completed);
+            
+            listEl.innerHTML = state.groceryList.map((item, index) => `
+                <li class="grocery-item ${item.completed ? 'completed' : ''}">
+                    <div class="grocery-checkbox" onclick="toggleGroceryItem(${index})">
+                        ${item.completed ? '✓' : ''}
+                    </div>
+                    <span class="grocery-item-name">${escapeHtml(item.name)}</span>
+                    <button class="btn btn-danger btn-icon" onclick="removeGroceryItem(${index})">✕</button>
+                </li>
+            `).join('');
+        }
+        
+        // ============================================
+        // SMART GROCERY SUGGESTIONS
+        // ============================================
+        
+        // Meal count state
+        let mealPlanCount = 5;
+        let suggestedGroceryItems = [];
+        
+        // Adjust meal count
+        function adjustMealCount(delta) {
+            mealPlanCount = Math.max(1, Math.min(14, mealPlanCount + delta));
+            document.getElementById('meal-count-display').textContent = mealPlanCount;
+            
+            // Update button states
+            document.getElementById('meal-decrease-btn').disabled = mealPlanCount <= 1;
+            document.getElementById('meal-increase-btn').disabled = mealPlanCount >= 14;
+        }
+        
+        // Generate smart grocery suggestions
+        async function suggestGroceryList() {
+            const suggestBtn = document.getElementById('suggest-grocery-btn');
+            const loader = document.getElementById('suggestion-loader');
+            const container = document.getElementById('suggested-items-container');
+            
+            // Check for API key
+            if (!getApiKey()) {
+                showToast('Please set your OpenAI API key in Settings', 'error');
+                showPage('settings');
+                return;
+            }
+            
+            // Show loading state
+            suggestBtn.disabled = true;
+            suggestBtn.innerHTML = '⏳ Analyzing...';
+            loader.style.display = 'flex';
+            container.style.display = 'none';
+            
+            try {
+                const pantryItems = state.pantry.map(item => item.name).join(', ');
+                const existingGrocery = state.groceryList.map(item => item.name).join(', ');
+                
+                // Get cuisine preferences if available
+                let cuisineContext = '';
+                if (state.cuisineHistory.length > 0) {
+                    const cuisineCounts = getCuisineCounts();
+                    const topCuisines = Object.entries(cuisineCounts)
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 3)
+                        .map(([cuisine]) => cuisine);
+                    cuisineContext = `User's favorite cuisines: ${topCuisines.join(', ')}. `;
+                }
+                
+                const systemPrompt = `You are a smart grocery planning assistant. You MUST respond with valid JSON only.
+
+${USER_PREFERENCES}
+
+Your task is to suggest grocery items that will help the user cook ${mealPlanCount} meals over the coming days.
+
+Guidelines:
+- Suggest items that complement what's already in their pantry
+- Focus on versatile ingredients that work across multiple meals
+- Include a mix of proteins, vegetables, and other essentials
+- Don't suggest items already in pantry or grocery list
+- Consider balanced nutrition and variety
+- Prioritize fresh items and proteins that may be running low
+- ${cuisineContext}Keep suggestions practical for a single person`;
+
+                const userPrompt = `Current pantry: ${pantryItems || 'Empty pantry'}
+Already on grocery list: ${existingGrocery || 'Nothing yet'}
+Number of meals to plan: ${mealPlanCount}
+
+Suggest 8-12 grocery items. For each item, provide:
+- name: the ingredient name
+- reason: brief explanation why (2-5 words)
+- category: one of "Protein", "Produce", "Dairy", "Pantry", "Frozen"
+
+Respond with JSON:
+{
+  "suggestions": [
+    { "name": "Chicken thighs", "reason": "Versatile protein option", "category": "Protein" },
+    { "name": "Bell peppers", "reason": "Colorful stir-fry base", "category": "Produce" }
+  ]
+}`;
+
+                const response = await callOpenAI(systemPrompt, userPrompt);
+                suggestedGroceryItems = response.suggestions || [];
+                
+                // Mark all as selected by default
+                suggestedGroceryItems.forEach(item => item.selected = true);
+                
+                renderSuggestedItems();
+                container.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error generating suggestions:', error);
+                showToast('Failed to generate suggestions. Try again!', 'error');
+            } finally {
+                suggestBtn.disabled = false;
+                suggestBtn.innerHTML = '🧠 Generate Smart List';
+                loader.style.display = 'none';
+            }
+        }
+        
+        // Render suggested items
+        function renderSuggestedItems() {
+            const listEl = document.getElementById('suggested-items-list');
+            const addBtn = document.getElementById('add-suggested-btn');
+            const selectAllBtn = document.getElementById('select-all-btn');
+            
+            if (!listEl || suggestedGroceryItems.length === 0) {
+                listEl.innerHTML = '<p style="text-align: center; color: var(--color-warm-gray); padding: var(--space-md);">No suggestions available</p>';
+                addBtn.disabled = true;
+                return;
+            }
+            
+            listEl.innerHTML = suggestedGroceryItems.map((item, index) => `
+                <div class="suggested-item ${item.selected ? 'selected' : ''}" onclick="toggleSuggestedItem(${index})">
+                    <div class="suggested-item-checkbox">
+                        ${item.selected ? '✓' : ''}
+                    </div>
+                    <div class="suggested-item-info">
+                        <div class="suggested-item-name">${escapeHtml(item.name)}</div>
+                        <div class="suggested-item-reason">${escapeHtml(item.reason || '')}</div>
+                    </div>
+                    <span class="suggested-item-category">${escapeHtml(item.category || 'Item')}</span>
+                </div>
+            `).join('');
+            
+            updateSuggestedButtonStates();
+        }
+        
+        // Toggle individual suggested item
+        function toggleSuggestedItem(index) {
+            suggestedGroceryItems[index].selected = !suggestedGroceryItems[index].selected;
+            renderSuggestedItems();
+        }
+        
+        // Toggle all suggested items
+        function toggleAllSuggested() {
+            const allSelected = suggestedGroceryItems.every(item => item.selected);
+            suggestedGroceryItems.forEach(item => item.selected = !allSelected);
+            renderSuggestedItems();
+        }
+        
+        // Update button states for suggested items
+        function updateSuggestedButtonStates() {
+            const addBtn = document.getElementById('add-suggested-btn');
+            const selectAllBtn = document.getElementById('select-all-btn');
+            
+            const selectedCount = suggestedGroceryItems.filter(item => item.selected).length;
+            const allSelected = selectedCount === suggestedGroceryItems.length;
+            
+            addBtn.disabled = selectedCount === 0;
+            addBtn.textContent = selectedCount > 0 
+                ? `Add ${selectedCount} Item${selectedCount > 1 ? 's' : ''} to List`
+                : 'Add Selected to List';
+            
+            selectAllBtn.textContent = allSelected ? 'Deselect All' : 'Select All';
+        }
+        
+        // Add selected suggested items to grocery list
+        function addSelectedToGroceryList() {
+            const selectedItems = suggestedGroceryItems.filter(item => item.selected);
+            let addedCount = 0;
+            
+            selectedItems.forEach(item => {
+                const exists = state.groceryList.some(
+                    existing => existing.name.toLowerCase() === item.name.toLowerCase()
+                );
+                
+                if (!exists) {
+                    state.groceryList.push({ name: item.name, completed: false });
+                    addedCount++;
+                }
+            });
+            
+            if (addedCount > 0) {
+                saveGroceryList();
+                renderGroceryList();
+                showToast(`Added ${addedCount} item${addedCount > 1 ? 's' : ''} to your list! 🛒`, 'success');
+                
+                // Clear and hide suggestions
+                suggestedGroceryItems = [];
+                document.getElementById('suggested-items-container').style.display = 'none';
+            } else {
+                showToast('All selected items are already in your list', 'error');
+            }
+        }
+        
+        // ============================================
+        // RECIPE LOG (CSV)
+        // ============================================
+        
+        // Get recipe log CSV
+        function getRecipeLog() {
+            return localStorage.getItem(STORAGE_KEYS.RECIPE_LOG) || RECIPE_LOG_HEADER;
+        }
+        
+        // Add entry to recipe log
+        function logRecipe(recipe) {
+            const now = new Date();
+            const date = now.toLocaleDateString('en-CA'); // YYYY-MM-DD format
+            const time = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            
+            const macros = recipe.macros || { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 };
+            
+            // Escape CSV fields (handle commas in recipe names)
+            const escapeCsv = (str) => {
+                if (str.includes(',') || str.includes('"')) {
+                    return `"${str.replace(/"/g, '""')}"`;
+                }
+                return str;
+            };
+            
+            const row = [
+                date,
+                time,
+                escapeCsv(recipe.title),
+                escapeCsv(recipe.cuisine || 'Unknown'),
+                recipe.estimated_time_minutes || 0,
+                macros.calories || 0,
+                macros.protein_g || 0,
+                macros.carbs_g || 0,
+                macros.fat_g || 0
+            ].join(',');
+            
+            const currentLog = getRecipeLog();
+            const newLog = currentLog + '\n' + row;
+            localStorage.setItem(STORAGE_KEYS.RECIPE_LOG, newLog);
+            
+            renderRecipeLogPreview();
+        }
+        
+        // Render recipe log preview and stats
+        function renderRecipeLogPreview() {
+            const statsEl = document.getElementById('recipe-log-stats');
+            const previewEl = document.getElementById('recipe-log-preview');
+            
+            if (!statsEl || !previewEl) return;
+            
+            const log = getRecipeLog();
+            const lines = log.trim().split('\n');
+            const recipeCount = lines.length - 1; // Exclude header
+            
+            // Calculate stats
+            let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
+            
+            if (recipeCount > 0) {
+                lines.slice(1).forEach(line => {
+                    const parts = line.split(',');
+                    totalCalories += parseInt(parts[5]) || 0;
+                    totalProtein += parseInt(parts[6]) || 0;
+                    totalCarbs += parseInt(parts[7]) || 0;
+                    totalFat += parseInt(parts[8]) || 0;
+                });
+            }
+            
+            statsEl.innerHTML = `
+                <div class="usage-stat-row">
+                    <span class="usage-stat-label">Recipes Cooked</span>
+                    <span class="usage-stat-value">${recipeCount}</span>
+                </div>
+                <div class="usage-stat-row">
+                    <span class="usage-stat-label">Total Calories</span>
+                    <span class="usage-stat-value">${totalCalories.toLocaleString()}</span>
+                </div>
+                <div class="usage-stat-row">
+                    <span class="usage-stat-label">Total Protein</span>
+                    <span class="usage-stat-value">${totalProtein}g</span>
+                </div>
+            `;
+            
+            if (recipeCount === 0) {
+                previewEl.innerHTML = '<span class="recipe-log-empty">No recipes logged yet. Start cooking!</span>';
+            } else {
+                // Show last 10 entries
+                const preview = [lines[0], ...lines.slice(-10)].join('\n');
+                previewEl.textContent = preview;
+            }
+        }
+        
+        // Export recipe log as CSV file
+        function exportRecipeLog() {
+            const log = getRecipeLog();
+            const blob = new Blob([log], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `pantryos_recipe_log_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('CSV downloaded!', 'success');
+        }
+        
+        // Copy recipe log to clipboard
+        function copyRecipeLog() {
+            const log = getRecipeLog();
+            navigator.clipboard.writeText(log).then(() => {
+                showToast('Copied to clipboard!', 'success');
+            }).catch(() => {
+                showToast('Failed to copy', 'error');
+            });
+        }
+        
+        // Clear recipe log
+        function clearRecipeLog() {
+            if (confirm('Clear your entire recipe log? This cannot be undone.')) {
+                localStorage.setItem(STORAGE_KEYS.RECIPE_LOG, RECIPE_LOG_HEADER);
+                renderRecipeLogPreview();
+                showToast('Recipe log cleared');
+            }
+        }
+        
+        // ============================================
+        // OPENAI API CALLS
+        // ============================================
+        
+        // Get API key from localStorage
+        function getApiKey() {
+            return localStorage.getItem(STORAGE_KEYS.API_KEY);
+        }
+        
+        // Make OpenAI API call
+        async function callOpenAI(systemPrompt, userPrompt) {
+            const apiKey = getApiKey();
+            
+            if (!apiKey) {
+                showToast('Please set your OpenAI API key in Settings', 'error');
+                throw new Error('No API key');
+            }
+            
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: 'gpt-5.1',
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: userPrompt }
+                    ],
+                    temperature: 0.8,
+                    response_format: { type: 'json_object' }
+                })
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error?.message || 'API request failed');
+            }
+            
+            const data = await response.json();
+            
+            // Track API usage
+            if (data.usage) {
+                state.apiUsage.totalInputTokens += data.usage.prompt_tokens || 0;
+                state.apiUsage.totalOutputTokens += data.usage.completion_tokens || 0;
+                state.apiUsage.totalCalls += 1;
+                saveApiUsage();
+            }
+            
+            return JSON.parse(data.choices[0].message.content);
+        }
+        
+        // Build system prompt with user preferences and cuisine history
+        function buildSystemPrompt() {
+            let prompt = `You are a helpful personal cooking assistant. You MUST respond with valid JSON only.
+
+${USER_PREFERENCES}
+`;
+            
+            // Add cuisine history if available
+            if (state.cuisineHistory.length > 0) {
+                const cuisineCounts = getCuisineCounts();
+                const topCuisines = Object.entries(cuisineCounts)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 5)
+                    .map(([cuisine, count]) => `${cuisine} (${count} times)`);
+                
+                prompt += `
+USER'S CUISINE PREFERENCES (learned from cooking history):
+The user has cooked these cuisines most frequently: ${topCuisines.join(', ')}.
+Weight your suggestions accordingly, but also introduce variety.
+`;
+            }
+            
+            return prompt;
+        }
+        
+        // ============================================
+        // RECIPE SUGGESTION FLOW
+        // ============================================
+        
+        // Start recipe suggestion flow
+        function startRecipeSuggestion() {
+            if (state.pantry.length === 0) {
+                showToast('Add items to your pantry first!', 'error');
+                return;
+            }
+            
+            if (!getApiKey()) {
+                showToast('Please set your OpenAI API key in Settings', 'error');
+                showPage('settings');
+                return;
+            }
+            
+            state.isFromNewRecipe = false;
+            showPage('suggest');
+            
+            // Use cached titles if available, otherwise generate new ones
+            if (state.cachedRecipeTitlesHtml) {
+                const titlesContainer = document.getElementById('recipe-titles');
+                const loader = document.getElementById('suggest-loader');
+                const newTitlesBtn = document.getElementById('new-titles-btn');
+                
+                loader.style.display = 'none';
+                titlesContainer.innerHTML = state.cachedRecipeTitlesHtml;
+                newTitlesBtn.style.display = 'block';
+            } else {
+                generateRecipeTitles();
+            }
+        }
+        
+        // Generate 3 recipe titles
+        async function generateRecipeTitles() {
+            const titlesContainer = document.getElementById('recipe-titles');
+            const loader = document.getElementById('suggest-loader');
+            const newTitlesBtn = document.getElementById('new-titles-btn');
+            
+            // Show loading state
+            loader.style.display = 'flex';
+            titlesContainer.innerHTML = '';
+            newTitlesBtn.style.display = 'none';
+            
+            // Clear cache when generating new titles
+            state.cachedRecipeTitles = null;
+            state.cachedRecipeTitlesHtml = null;
+            
+            try {
+                const systemPrompt = buildSystemPrompt();
+                
+                const pantryList = state.pantry.map(item => 
+                    `${item.name}: ${item.quantity} ${item.unit}`
+                ).join('\n');
+                
+                const userPrompt = `Based on these pantry items:
+${pantryList}
+
+Generate exactly 3 creative recipe titles that can be made using PRIMARILY these ingredients.
+It's OK if the recipe needs 1-2 additional common ingredients.
+The recipes should align with the user's preferences.
+Include estimated macros for each recipe (per serving).
+
+Respond with JSON in this exact format:
+{
+  "recipes": [
+    { "title": "Recipe Title", "macros": { "calories": 450, "protein_g": 30, "carbs_g": 40, "fat_g": 15 } }
+  ]
+}`;
+                
+                const response = await callOpenAI(systemPrompt, userPrompt);
+                
+                // Display titles with macros (editable)
+                const recipes = response.recipes || response.titles?.map(t => ({ title: t, macros: null })) || [];
+                const titlesHtml = recipes.map((recipe, index) => {
+                    const title = typeof recipe === 'string' ? recipe : recipe.title;
+                    const macros = recipe.macros || null;
+                    return `
+                    <div class="recipe-title-card" onclick="selectRecipeTitle('${escapeHtml(title).replace(/'/g, "\\'")}')">
+                        <div class="recipe-title-card-content">
+                            <span class="recipe-title-name">${escapeHtml(title)}</span>
+                            ${macros ? `
+                            <div class="recipe-title-macros">
+                                <div class="title-macro calories">
+                                    <span class="title-macro-value">${macros.calories}</span>
+                                    <span class="title-macro-label">Cal</span>
+                                </div>
+                                <div class="title-macro">
+                                    <span class="title-macro-value">${macros.protein_g}g</span>
+                                    <span class="title-macro-label">Prot</span>
+                                </div>
+                                <div class="title-macro">
+                                    <span class="title-macro-value">${macros.carbs_g}g</span>
+                                    <span class="title-macro-label">Carb</span>
+                                </div>
+                                <div class="title-macro">
+                                    <span class="title-macro-value">${macros.fat_g}g</span>
+                                    <span class="title-macro-label">Fat</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `}).join('');
+                
+                titlesContainer.innerHTML = titlesHtml;
+                
+                // Cache the titles for navigation
+                state.cachedRecipeTitles = recipes;
+                state.cachedRecipeTitlesHtml = titlesHtml;
+                
+                newTitlesBtn.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error generating titles:', error);
+                titlesContainer.innerHTML = `
+                    <div class="missing-alert" style="background: var(--color-danger);">
+                        <h4>Oops!</h4>
+                        <p>${escapeHtml(error.message)}</p>
+                    </div>
+                `;
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+        
+        // Save the current state of title inputs to cache
+        function saveTitlesCache() {
+            const titlesContainer = document.getElementById('recipe-titles');
+            if (titlesContainer && titlesContainer.innerHTML.trim()) {
+                state.cachedRecipeTitlesHtml = titlesContainer.innerHTML;
+            }
+        }
+        
+        // Select a recipe title and generate full recipe
+        async function selectRecipeTitle(title) {
+            showPage('recipe');
+            
+            const loader = document.getElementById('recipe-loader');
+            const content = document.getElementById('recipe-content');
+            
+            loader.style.display = 'flex';
+            content.style.display = 'none';
+            
+            try {
+                const systemPrompt = buildSystemPrompt();
+                
+                const pantryList = state.pantry.map(item => 
+                    `${item.name}: ${item.quantity} ${item.unit}`
+                ).join('\n');
+                
+                const userPrompt = `Create a complete recipe for: "${title}"
+
+Available pantry items:
+${pantryList}
+
+Generate a detailed recipe in this exact JSON format:
+{
+  "title": "${title}",
+  "servings": 1,
+  "ingredients": [
+    { "name": "ingredient name", "quantity": 1, "unit": "unit" }
+  ],
+  "instructions": ["Step 1...", "Step 2...", "..."],
+  "estimated_time_minutes": 20,
+  "cuisine": "Italian/Japanese/Mediterranean/etc",
+  "macros": {
+    "calories": 450,
+    "protein_g": 35,
+    "carbs_g": 30,
+    "fat_g": 18
+  }
+}
+
+Requirements:
+- Use ingredients from the pantry when available
+- Keep cooking time under 30 minutes
+- Prefer stovetop or microwave methods
+- Include exact quantities for all ingredients
+- Estimate macros accurately based on ingredients and portions`;
+                
+                const recipe = await callOpenAI(systemPrompt, userPrompt);
+                state.currentRecipe = recipe;
+                
+                // Add to recipe history
+                addToRecipeHistory(recipe);
+                
+                // Check for missing ingredients
+                checkMissingIngredients(recipe);
+                
+                // Display recipe
+                displayRecipe(recipe);
+                
+            } catch (error) {
+                console.error('Error generating recipe:', error);
+                content.innerHTML = `
+                    <div class="missing-alert" style="background: var(--color-danger);">
+                        <h4>Error</h4>
+                        <p>${escapeHtml(error.message)}</p>
+                    </div>
+                `;
+                content.style.display = 'block';
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+        
+        // Check for missing ingredients
+        function checkMissingIngredients(recipe) {
+            state.missingIngredients = [];
+            
+            recipe.ingredients.forEach(ingredient => {
+                const inPantry = state.pantry.find(item => 
+                    item.name.toLowerCase().includes(ingredient.name.toLowerCase()) ||
+                    ingredient.name.toLowerCase().includes(item.name.toLowerCase())
+                );
+                
+                if (!inPantry) {
+                    state.missingIngredients.push(ingredient);
+                }
+            });
+        }
+        
+        // Display full recipe
+        function displayRecipe(recipe) {
+            const content = document.getElementById('recipe-content');
+            
+            // Update header
+            document.getElementById('recipe-title-display').textContent = recipe.title;
+            document.getElementById('recipe-time').textContent = `⏱️ ${recipe.estimated_time_minutes} min`;
+            document.getElementById('recipe-servings').textContent = `👤 ${recipe.servings} serving${recipe.servings > 1 ? 's' : ''}`;
+            document.getElementById('recipe-cuisine').textContent = `🌍 ${recipe.cuisine}`;
+            
+            // Handle missing ingredients alert
+            const missingAlert = document.getElementById('missing-alert');
+            const missingList = document.getElementById('missing-list');
+            const missingTitle = document.getElementById('missing-alert-title');
+            const missingText = document.getElementById('missing-alert-text');
+            
+            if (state.missingIngredients.length > 0) {
+                // Customize message based on how many ingredients are missing
+                if (state.missingIngredients.length <= 2) {
+                    missingTitle.textContent = 'Almost there! 🏃';
+                    missingText.textContent = "You're only missing a few ingredients and you live 5 minutes from Whole Foods — go grab them!";
+                } else if (state.missingIngredients.length === recipe.ingredients.length) {
+                    missingTitle.textContent = 'Shopping trip needed! 🛒';
+                    missingText.textContent = "You don't have any of these ingredients yet. Add them to your grocery list!";
+                } else {
+                    missingTitle.textContent = 'Missing some ingredients 📝';
+                    missingText.textContent = `You're missing ${state.missingIngredients.length} of ${recipe.ingredients.length} ingredients. Add them to your grocery list!`;
+                }
+                
+                missingList.innerHTML = state.missingIngredients.map(ing => 
+                    `<span class="missing-tag">${ing.quantity} ${ing.unit} ${escapeHtml(ing.name)}</span>`
+                ).join('');
+                missingAlert.style.display = 'block';
+            } else {
+                missingAlert.style.display = 'none';
+            }
+            
+            // Render ingredients
+            const ingredientsList = document.getElementById('ingredients-list');
+            ingredientsList.innerHTML = recipe.ingredients.map(ing => {
+                const inPantry = state.pantry.find(item => 
+                    item.name.toLowerCase().includes(ing.name.toLowerCase()) ||
+                    ing.name.toLowerCase().includes(item.name.toLowerCase())
+                );
+                
+                return `
+                    <li class="ingredient-item">
+                        <span class="ingredient-status ${inPantry ? 'ingredient-have' : 'ingredient-missing'}">
+                            ${inPantry ? '✓' : '!'}
+                        </span>
+                        <span>${ing.quantity} ${escapeHtml(ing.unit)} ${escapeHtml(ing.name)}</span>
+                    </li>
+                `;
+            }).join('');
+            
+            // Render instructions
+            const instructionsList = document.getElementById('instructions-list');
+            instructionsList.innerHTML = recipe.instructions.map(step => 
+                `<li class="instruction-item">${escapeHtml(step)}</li>`
+            ).join('');
+            
+            // Render macros
+            const macrosDisplay = document.getElementById('macros-display');
+            const macros = recipe.macros || { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 };
+            macrosDisplay.innerHTML = `
+                <div class="macro-item calories">
+                    <div class="macro-value">${macros.calories}</div>
+                    <div class="macro-label">Calories</div>
+                </div>
+                <div class="macro-item">
+                    <div class="macro-value">${macros.protein_g}g</div>
+                    <div class="macro-label">Protein</div>
+                </div>
+                <div class="macro-item">
+                    <div class="macro-value">${macros.carbs_g}g</div>
+                    <div class="macro-label">Carbs</div>
+                </div>
+                <div class="macro-item">
+                    <div class="macro-value">${macros.fat_g}g</div>
+                    <div class="macro-label">Fat</div>
+                </div>
+            `;
+            
+            // Update cook button based on missing ingredients
+            const cookBtn = document.getElementById('cook-btn');
+            const cookAnywayBtn = document.getElementById('cook-anyway-btn');
+            
+            if (state.missingIngredients.length > 0) {
+                cookBtn.textContent = '🛒 Go to Grocery List';
+                cookBtn.onclick = () => showPage('grocery');
+                // Show "Cook Anyway" button when missing ingredients
+                cookAnywayBtn.style.display = 'block';
+            } else {
+                cookBtn.textContent = '👨‍🍳 Cook This Recipe';
+                cookBtn.onclick = cookRecipe;
+                // Hide "Cook Anyway" button when we have all ingredients
+                cookAnywayBtn.style.display = 'none';
+            }
+            
+            content.style.display = 'block';
+        }
+        
+        // Mark missing ingredients as bought (add to pantry)
+        function markIngredientsBought() {
+            state.missingIngredients.forEach(ing => {
+                const existingIndex = state.pantry.findIndex(
+                    item => item.name.toLowerCase() === ing.name.toLowerCase()
+                );
+                
+                if (existingIndex >= 0) {
+                    state.pantry[existingIndex].quantity += ing.quantity;
+                } else {
+                    state.pantry.push({
+                        name: ing.name,
+                        quantity: ing.quantity,
+                        unit: ing.unit
+                    });
+                }
+            });
+            
+            savePantry();
+            state.missingIngredients = [];
+            
+            // Hide the alert
+            document.getElementById('missing-alert').style.display = 'none';
+            
+            // Update ingredients display
+            displayRecipe(state.currentRecipe);
+            
+            showToast('Ingredients added to pantry! 🎉', 'success');
+        }
+        
+        // Add missing ingredients to grocery list
+        function addMissingToGroceryList() {
+            let addedCount = 0;
+            
+            state.missingIngredients.forEach(ing => {
+                const itemName = `${ing.quantity} ${ing.unit} ${ing.name}`;
+                
+                // Check if already in grocery list
+                const exists = state.groceryList.some(
+                    item => item.name.toLowerCase() === itemName.toLowerCase() ||
+                            item.name.toLowerCase().includes(ing.name.toLowerCase())
+                );
+                
+                if (!exists) {
+                    state.groceryList.push({ name: itemName, completed: false });
+                    addedCount++;
+                }
+            });
+            
+            saveGroceryList();
+            
+            // Hide the alert
+            document.getElementById('missing-alert').style.display = 'none';
+            
+            if (addedCount > 0) {
+                showToast(`${addedCount} item${addedCount > 1 ? 's' : ''} added to grocery list! 🛒`, 'success');
+            } else {
+                showToast('Items already in your grocery list!', 'success');
+            }
+        }
+        
+        // Cook the recipe - subtract ingredients from pantry
+        function cookRecipe() {
+            if (!state.currentRecipe) return;
+            
+            // Subtract ingredients from pantry
+            state.currentRecipe.ingredients.forEach(recipeIng => {
+                const pantryIndex = state.pantry.findIndex(item => 
+                    item.name.toLowerCase().includes(recipeIng.name.toLowerCase()) ||
+                    recipeIng.name.toLowerCase().includes(item.name.toLowerCase())
+                );
+                
+                if (pantryIndex >= 0) {
+                    state.pantry[pantryIndex].quantity -= recipeIng.quantity;
+                    
+                    // Remove if quantity is 0 or negative
+                    if (state.pantry[pantryIndex].quantity <= 0) {
+                        state.pantry.splice(pantryIndex, 1);
+                    }
+                }
+            });
+            
+            savePantry();
+            
+            // Log cuisine preference
+            if (state.currentRecipe.cuisine) {
+                state.cuisineHistory.push(state.currentRecipe.cuisine);
+                saveCuisineHistory();
+            }
+            
+            // Log recipe to CSV with macros
+            logRecipe(state.currentRecipe);
+            
+            showToast(`Enjoy your ${state.currentRecipe.title}! 🍳`, 'success');
+            
+            // Return to home
+            setTimeout(() => {
+                showPage('home');
+            }, 1500);
+        }
+        
+        // Show grocery list for recipes with many missing ingredients
+        function showGroceryList() {
+            const items = state.missingIngredients.map(ing => 
+                `• ${ing.quantity} ${ing.unit} ${ing.name}`
+            ).join('\n');
+            
+            alert(`Shopping List:\n\n${items}\n\nHead to Whole Foods or Trader's Joe's!`);
+        }
+        
+        // Modify the current recipe based on user input
+        async function modifyRecipe() {
+            const modifyInput = document.getElementById('modify-recipe-input');
+            const modification = modifyInput.value.trim();
+            
+            if (!modification) {
+                showToast('Please describe how you want to modify the recipe', 'error');
+                return;
+            }
+            
+            if (!state.currentRecipe) {
+                showToast('No recipe to modify', 'error');
+                return;
+            }
+            
+            const loader = document.getElementById('recipe-loader');
+            const content = document.getElementById('recipe-content');
+            
+            loader.style.display = 'flex';
+            content.style.display = 'none';
+            
+            try {
+                const systemPrompt = buildSystemPrompt();
+                
+                const pantryList = state.pantry.map(item => 
+                    `${item.name}: ${item.quantity} ${item.unit}`
+                ).join('\n');
+                
+                const userPrompt = `Modify this existing recipe based on the user's request.
+
+CURRENT RECIPE:
+${JSON.stringify(state.currentRecipe, null, 2)}
+
+USER'S MODIFICATION REQUEST:
+"${modification}"
+
+AVAILABLE PANTRY ITEMS:
+${pantryList}
+
+Generate the MODIFIED recipe in this exact JSON format:
+{
+  "title": "Recipe Title (updated if name changed)",
+  "servings": 1,
+  "ingredients": [
+    { "name": "ingredient name", "quantity": 1, "unit": "unit" }
+  ],
+  "instructions": ["Step 1...", "Step 2...", "..."],
+  "estimated_time_minutes": 20,
+  "cuisine": "Italian/Japanese/Mediterranean/etc",
+  "macros": {
+    "calories": 450,
+    "protein_g": 35,
+    "carbs_g": 30,
+    "fat_g": 18
+  }
+}
+
+Requirements:
+- Apply the user's modifications to the recipe
+- Use ingredients from the pantry when available
+- Keep cooking time reasonable
+- Include exact quantities for all ingredients
+- Update macros based on the modified ingredients`;
+                
+                const recipe = await callOpenAI(systemPrompt, userPrompt);
+                state.currentRecipe = recipe;
+                
+                // Check for missing ingredients
+                checkMissingIngredients(recipe);
+                
+                // Display updated recipe
+                displayRecipe(recipe);
+                
+                // Clear the modification input
+                modifyInput.value = '';
+                
+                showToast('Recipe updated! 🔄', 'success');
+                
+            } catch (error) {
+                console.error('Error modifying recipe:', error);
+                content.innerHTML = `
+                    <div class="missing-alert" style="background: var(--color-danger);">
+                        <h4>Error</h4>
+                        <p>${escapeHtml(error.message)}</p>
+                    </div>
+                `;
+                content.style.display = 'block';
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+        
+        // Cook recipe even with missing ingredients
+        function cookRecipeAnyway() {
+            if (!state.currentRecipe) return;
+            
+            // Only subtract ingredients we actually have
+            state.currentRecipe.ingredients.forEach(recipeIng => {
+                const pantryIndex = state.pantry.findIndex(item => 
+                    item.name.toLowerCase().includes(recipeIng.name.toLowerCase()) ||
+                    recipeIng.name.toLowerCase().includes(item.name.toLowerCase())
+                );
+                
+                if (pantryIndex >= 0) {
+                    state.pantry[pantryIndex].quantity -= recipeIng.quantity;
+                    
+                    // Remove if quantity is 0 or negative
+                    if (state.pantry[pantryIndex].quantity <= 0) {
+                        state.pantry.splice(pantryIndex, 1);
+                    }
+                }
+            });
+            
+            savePantry();
+            
+            // Log cuisine preference
+            if (state.currentRecipe.cuisine) {
+                state.cuisineHistory.push(state.currentRecipe.cuisine);
+                saveCuisineHistory();
+            }
+            
+            // Log recipe to CSV with macros
+            logRecipe(state.currentRecipe);
+            
+            const missingCount = state.missingIngredients.length;
+            showToast(`Cooking ${state.currentRecipe.title}! (skipping ${missingCount} ingredient${missingCount > 1 ? 's' : ''}) 🍳`, 'success');
+            
+            // Return to home
+            setTimeout(() => {
+                showPage('home');
+            }, 1500);
+        }
+        
+        // ============================================
+        // NEW RECIPE CREATION
+        // ============================================
+        
+        // Generate custom recipe based on user input
+        async function generateCustomRecipe() {
+            const customRequest = document.getElementById('custom-request').value.trim();
+            
+            if (!customRequest) {
+                showToast('Please describe what you want to make', 'error');
+                return;
+            }
+            
+            await generateNewRecipeTitles(customRequest);
+        }
+        
+        // Generate random recipe suggestion
+        async function generateRandomRecipe() {
+            await generateNewRecipeTitles('Surprise me with something delicious and creative!');
+        }
+        
+        // Brainstorm more recipes without needing input
+        async function brainstormMoreRecipes() {
+            const customRequest = document.getElementById('custom-request').value.trim();
+            // Use custom request if provided, otherwise brainstorm freely
+            const request = customRequest || 'Brainstorm something new and creative! Give me different options than before.';
+            await generateNewRecipeTitles(request);
+        }
+        
+        // Generate titles for new recipe
+        async function generateNewRecipeTitles(request) {
+            const loader = document.getElementById('new-recipe-loader');
+            const titlesContainer = document.getElementById('new-recipe-titles');
+            const titlesList = document.getElementById('new-recipe-titles-list');
+            
+            loader.style.display = 'flex';
+            titlesContainer.style.display = 'none';
+            
+            try {
+                const systemPrompt = buildSystemPrompt();
+                
+                const pantryList = state.pantry.length > 0 
+                    ? state.pantry.map(item => `${item.name}: ${item.quantity} ${item.unit}`).join('\n')
+                    : 'Pantry is empty - suggest recipes that need shopping';
+                
+                const userPrompt = `User request: "${request}"
+
+Available pantry items:
+${pantryList}
+
+Generate exactly 3 creative recipe titles that match this request.
+Consider the user's preferences and try to use pantry items when possible.
+It's OK if recipes need additional ingredients since the user lives close to the store.
+Include estimated macros for each recipe (per serving).
+
+Respond with JSON in this exact format:
+{
+  "recipes": [
+    { "title": "Recipe Title", "macros": { "calories": 450, "protein_g": 30, "carbs_g": 40, "fat_g": 15 } }
+  ]
+}`;
+                
+                const response = await callOpenAI(systemPrompt, userPrompt);
+                
+                // Display titles with macros
+                const recipes = response.recipes || response.titles?.map(t => ({ title: t, macros: null })) || [];
+                titlesList.innerHTML = recipes.map((recipe, index) => {
+                    const title = typeof recipe === 'string' ? recipe : recipe.title;
+                    const macros = recipe.macros || null;
+                    return `
+                    <div class="recipe-title-card" onclick="selectNewRecipeTitle('${escapeHtml(title).replace(/'/g, "\\'")}')">
+                        <div class="recipe-title-card-content">
+                            <span class="recipe-title-name">${escapeHtml(title)}</span>
+                            ${macros ? `
+                            <div class="recipe-title-macros">
+                                <div class="title-macro calories">
+                                    <span class="title-macro-value">${macros.calories}</span>
+                                    <span class="title-macro-label">Cal</span>
+                                </div>
+                                <div class="title-macro">
+                                    <span class="title-macro-value">${macros.protein_g}g</span>
+                                    <span class="title-macro-label">Prot</span>
+                                </div>
+                                <div class="title-macro">
+                                    <span class="title-macro-value">${macros.carbs_g}g</span>
+                                    <span class="title-macro-label">Carb</span>
+                                </div>
+                                <div class="title-macro">
+                                    <span class="title-macro-value">${macros.fat_g}g</span>
+                                    <span class="title-macro-label">Fat</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `}).join('');
+                
+                titlesContainer.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error generating titles:', error);
+                showToast(error.message, 'error');
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+        
+        // Select new recipe title
+        function selectNewRecipeTitle(title) {
+            state.isFromNewRecipe = true;
+            
+            // Update back button to go to new-recipe page
+            const backBtn = document.querySelector('#recipe-page .back-btn');
+            backBtn.onclick = () => showPage('new-recipe');
+            backBtn.textContent = '← Back to Options';
+            
+            selectRecipeTitle(title);
+        }
+        
+        // ============================================
+        // SETTINGS
+        // ============================================
+        
+        function saveSettings(event) {
+            event.preventDefault();
+            
+            const apiKey = document.getElementById('api-key').value.trim();
+            
+            if (!apiKey) {
+                showToast('Please enter an API key', 'error');
+                return;
+            }
+            
+            localStorage.setItem(STORAGE_KEYS.API_KEY, apiKey);
+            showToast('Settings saved!', 'success');
+        }
+        
+        // ============================================
+        // CUISINE HISTORY
+        // ============================================
+        
+        // Get cuisine counts from history
+        function getCuisineCounts() {
+            const counts = {};
+            state.cuisineHistory.forEach(cuisine => {
+                counts[cuisine] = (counts[cuisine] || 0) + 1;
+            });
+            return counts;
+        }
+        
+        // Render cuisine history in settings
+        function renderCuisineHistory() {
+            const container = document.getElementById('cuisine-history');
+            
+            if (state.cuisineHistory.length === 0) {
+                container.innerHTML = '<span class="cuisine-tag" style="background: #f0f0f0; color: #999;">No cooking history yet</span>';
+                return;
+            }
+            
+            const counts = getCuisineCounts();
+            const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+            
+            container.innerHTML = sorted.map(([cuisine, count]) => 
+                `<span class="cuisine-tag">${escapeHtml(cuisine)} (${count})<button class="cuisine-tag-delete" onclick="removeCuisinePreference('${escapeHtml(cuisine)}')" title="Remove">×</button></span>`
+            ).join('');
+        }
+        
+        // Remove a specific cuisine from preferences
+        function removeCuisinePreference(cuisine) {
+            state.cuisineHistory = state.cuisineHistory.filter(c => c !== cuisine);
+            saveCuisineHistory();
+            renderCuisineHistory();
+            updateCuisinePreview();
+            showToast(`Removed ${cuisine} from preferences`);
+        }
+        
+        // Update cuisine preview on home page
+        function updateCuisinePreview() {
+            const preview = document.getElementById('cuisine-preview');
+            const tags = document.getElementById('cuisine-tags');
+            
+            if (state.cuisineHistory.length === 0) {
+                preview.style.display = 'none';
+                return;
+            }
+            
+            const counts = getCuisineCounts();
+            const top3 = Object.entries(counts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3);
+            
+            tags.innerHTML = top3.map(([cuisine, count]) => 
+                `<span class="cuisine-tag">${escapeHtml(cuisine)}</span>`
+            ).join('');
+            
+            preview.style.display = 'block';
+        }
+        
+        // Reset cuisine history
+        function resetCuisineHistory() {
+            if (confirm('Reset your cuisine preferences?')) {
+                state.cuisineHistory = [];
+                saveCuisineHistory();
+                renderCuisineHistory();
+                updateCuisinePreview();
+                showToast('Preferences reset');
+            }
+        }
+        
+        // ============================================
+        // API USAGE TRACKING
+        // ============================================
+        
+        // Calculate estimated cost
+        function calculateApiCost() {
+            const inputCost = (state.apiUsage.totalInputTokens / 1000000) * API_PRICING.input;
+            const outputCost = (state.apiUsage.totalOutputTokens / 1000000) * API_PRICING.output;
+            return inputCost + outputCost;
+        }
+        
+        // Format number with commas
+        function formatNumber(num) {
+            return num.toLocaleString();
+        }
+        
+        // Render API usage stats
+        function renderApiUsage() {
+            const container = document.getElementById('api-usage-stats');
+            const totalCost = calculateApiCost();
+            const sinceDate = state.apiUsage.lastReset 
+                ? new Date(state.apiUsage.lastReset).toLocaleDateString() 
+                : 'N/A';
+            
+            container.innerHTML = `
+                <div class="usage-stat-row">
+                    <span class="usage-stat-label">API Calls</span>
+                    <span class="usage-stat-value">${formatNumber(state.apiUsage.totalCalls)}</span>
+                </div>
+                <div class="usage-stat-row">
+                    <span class="usage-stat-label">Input Tokens</span>
+                    <span class="usage-stat-value">${formatNumber(state.apiUsage.totalInputTokens)}</span>
+                </div>
+                <div class="usage-stat-row">
+                    <span class="usage-stat-label">Output Tokens</span>
+                    <span class="usage-stat-value">${formatNumber(state.apiUsage.totalOutputTokens)}</span>
+                </div>
+                <div class="usage-stat-row">
+                    <span class="usage-stat-label">Tracking Since</span>
+                    <span class="usage-stat-value">${sinceDate}</span>
+                </div>
+                <div class="usage-total">
+                    <div class="usage-total-label">Estimated Total Spent</div>
+                    <div class="usage-total-value">$${totalCost.toFixed(4)}</div>
+                </div>
+            `;
+        }
+        
+        // Reset API usage stats
+        function resetApiUsage() {
+            if (confirm('Reset your API usage statistics?')) {
+                state.apiUsage = {
+                    totalInputTokens: 0,
+                    totalOutputTokens: 0,
+                    totalCalls: 0,
+                    lastReset: new Date().toISOString()
+                };
+                saveApiUsage();
+                renderApiUsage();
+                showToast('Usage stats reset');
+            }
+        }
+        
+        // ============================================
+        // RECIPE HISTORY
+        // ============================================
+        
+        // Add recipe to history
+        function addToRecipeHistory(recipe) {
+            // Create a history entry
+            const historyEntry = {
+                id: Date.now(),
+                title: recipe.title,
+                cuisine: recipe.cuisine || 'Unknown',
+                cookingTime: recipe.estimated_time_minutes || 0,
+                macros: recipe.macros || { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 },
+                timestamp: new Date().toISOString(),
+                fullRecipe: recipe
+            };
+            
+            // Check if recipe already exists in history (by title)
+            const existingIndex = state.recipeHistory.findIndex(
+                r => r.title.toLowerCase() === recipe.title.toLowerCase()
+            );
+            
+            if (existingIndex >= 0) {
+                // Update the existing entry with new timestamp
+                state.recipeHistory[existingIndex] = historyEntry;
+                // Move to front of array (most recent)
+                const updated = state.recipeHistory.splice(existingIndex, 1)[0];
+                state.recipeHistory.unshift(updated);
+            } else {
+                // Add new entry at the beginning
+                state.recipeHistory.unshift(historyEntry);
+            }
+            
+            // Limit history to 50 items
+            if (state.recipeHistory.length > 50) {
+                state.recipeHistory = state.recipeHistory.slice(0, 50);
+            }
+            
+            saveRecipeHistory();
+        }
+        
+        // Render recipe history
+        function renderRecipeHistory() {
+            const listEl = document.getElementById('history-list');
+            const emptyEl = document.getElementById('history-empty');
+            const clearBtn = document.getElementById('clear-history-btn');
+            
+            if (!listEl) return;
+            
+            if (state.recipeHistory.length === 0) {
+                listEl.innerHTML = '';
+                emptyEl.style.display = 'block';
+                clearBtn.style.display = 'none';
+                return;
+            }
+            
+            emptyEl.style.display = 'none';
+            clearBtn.style.display = 'block';
+            
+            // Group by date
+            const groupedHistory = {};
+            state.recipeHistory.forEach(entry => {
+                const date = new Date(entry.timestamp);
+                const dateKey = getDateLabel(date);
+                
+                if (!groupedHistory[dateKey]) {
+                    groupedHistory[dateKey] = [];
+                }
+                groupedHistory[dateKey].push(entry);
+            });
+            
+            // Render grouped history
+            listEl.innerHTML = Object.entries(groupedHistory).map(([dateLabel, entries]) => `
+                <div class="history-date-group">
+                    <div class="history-date-label">${dateLabel}</div>
+                    ${entries.map(entry => `
+                        <div class="history-item" onclick="selectFromHistory(${entry.id})">
+                            <div class="history-item-header">
+                                <span class="history-item-title">${escapeHtml(entry.title)}</span>
+                                <span class="history-item-date">${formatTime(entry.timestamp)}</span>
+                            </div>
+                            <div class="history-item-macros">
+                                <span class="history-macro calories">${entry.macros.calories} cal</span>
+                                <span class="history-macro">${entry.macros.protein_g}g protein</span>
+                                <span class="history-macro">⏱️ ${entry.cookingTime}min</span>
+                                <span class="history-macro">🌍 ${escapeHtml(entry.cuisine)}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+        
+        // Get date label for grouping
+        function getDateLabel(date) {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const entryDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            
+            if (entryDate.getTime() === today.getTime()) {
+                return 'Today';
+            } else if (entryDate.getTime() === yesterday.getTime()) {
+                return 'Yesterday';
+            } else {
+                // Show date for older entries
+                return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+            }
+        }
+        
+        // Format time for display
+        function formatTime(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        }
+        
+        // Select recipe from history
+        function selectFromHistory(id) {
+            const entry = state.recipeHistory.find(r => r.id === id);
+            if (!entry || !entry.fullRecipe) {
+                showToast('Recipe details not available', 'error');
+                return;
+            }
+            
+            // Set current recipe
+            state.currentRecipe = entry.fullRecipe;
+            state.isFromNewRecipe = false;
+            
+            // Update back button
+            const backBtn = document.querySelector('#recipe-page .back-btn');
+            backBtn.onclick = () => showPage('history');
+            backBtn.textContent = '← Back to History';
+            
+            // Navigate to recipe page
+            showPage('recipe');
+            
+            // Check for missing ingredients with current pantry
+            checkMissingIngredients(entry.fullRecipe);
+            
+            // Display recipe
+            displayRecipe(entry.fullRecipe);
+        }
+        
+        // Clear recipe history
+        function clearRecipeHistory() {
+            if (confirm('Clear your entire recipe history? This cannot be undone.')) {
+                state.recipeHistory = [];
+                saveRecipeHistory();
+                renderRecipeHistory();
+                showToast('Recipe history cleared');
+            }
+        }
+        
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        
+        // Escape HTML to prevent XSS
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+        
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            container.appendChild(toast);
+            
+            // Remove after animation
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
+
